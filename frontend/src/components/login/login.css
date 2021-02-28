@@ -1,0 +1,31 @@
+.intro {
+    margin-left: 100px;
+    margin-top: 50px;
+    font-family: sans-serif;
+    color: grey;
+    padding-left: 35%;
+  }
+  
+  .loginImage{
+      margin-left: 700px;
+      margin-top: 100px;
+  }
+  
+  
+  .loginform{
+      font-family: sans-serif;
+      color:black;
+  }
+  
+  .name{
+      font-size: large;
+  }
+  
+  .login
+  {
+      font-size: 20px;
+      color:white;
+      background-color:orangered ;
+      margin-left: 50px;
+  }
+  
