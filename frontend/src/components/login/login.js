@@ -47,6 +47,7 @@ class login extends Component {
       email: this.state.email,
       password: this.state.password,
     };
+    axios.defaults.withCredentials = true;
     axios.post("http://localhost:3001/login", data).then((response) => {
       // eslint-disable-next-line react/no-direct-mutation-state
       // this.setState({errCode :response.status})

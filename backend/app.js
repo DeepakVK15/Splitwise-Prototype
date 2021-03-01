@@ -20,7 +20,7 @@ const { response } = require("express");
 
 app.use(bodyParser.json());
 app.use(cookieParser());
-// app.use(cors({ origin: frontendURI, credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 //use cors to allow cross origin resource sharing
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -46,6 +46,7 @@ const db = mysql.createConnection({
 //Allow Access Control
 app.use(function (req, res, next) {
   //   res.setHeader("Access-Control-Allow-Origin", frontendURI);
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -122,4 +123,48 @@ app.post("/login", function (req, res) {
   });
 });
 
-module.exports = app;
+app.post("/creategroup", function (req, res) {
+  const groupname = req.body.groupname;
+  const friends = req.body.friends;
+  const image = req.body.image;
+  db.query('select * from usersingroup where groupname = ?',[groupname],
+  (err,result) => {
+    if(err){
+      console.log(err);
+    }
+   if(result.length > 0){
+     res.send({message: 'Group with the same name already exists.'})
+   }
+   else{
+    for(var i=0;i<friends.length;i++){
+      console.log("In loop");
+      let email = friends[i].email;
+      db.query("select * from users where email = ?",[email],
+      (err, result3) =>{
+        if(err){
+          console.log(err);
+        }
+        if(result3.length === 1){
+          db.query(
+            "insert into usersingroup (email, groupname) VALUES (?,?)",
+            [email, groupname],
+            (err, result2) => {
+              if (err) {
+                console.log(err);}
+             
+            }
+          )
+        }
+      })
+   
+    }
+    res.send({message: "inserted users"});
+   }
+  }
+  
+  );
+  
+});
+  module.exports = app;
+
+

@@ -62,6 +62,7 @@ class signup extends Component {
         // this.setState({errCode :response.status})
         if (response.data.message) {
           this.setState({ errCode: response.data.message });
+          console.log(this.state.errCode);
         }
       });
     }
@@ -71,6 +72,7 @@ class signup extends Component {
     let errMsg = null;
 
     if (this.state.errCode === "sign up success") {
+      
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
       this.state.errCode === "Enter a valid email address." ||
