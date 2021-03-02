@@ -72,7 +72,6 @@ class signup extends Component {
     let errMsg = null;
 
     if (this.state.errCode === "sign up success") {
-      
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
       this.state.errCode === "Enter a valid email address." ||

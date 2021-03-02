@@ -8,22 +8,24 @@ var cookieParser = require("cookie-parser");
 var passwordHash = require("password-hash");
 const mysql = require("mysql2");
 const {
-  mysqlHost,
+  cmysqlHost,
   mysqlUser,
   mysqlPassword,
   mysqlDatabase,
-} = require("./utils/connection");
+} = require("./utils/config");
 const { json } = require("body-parser");
 const { response } = require("express");
+const { beginTransaction } = require("./utils/connection");
 
 // const { frontendURI } = require("./utils/config");
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 //use cors to allow cross origin resource sharing
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+// app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 //use express session to maintain session data
 app.use(
@@ -41,12 +43,16 @@ const db = mysql.createConnection({
   host: "splitwise-database1.ciyuzmcv7xt0.us-west-1.rds.amazonaws.com",
   password: "adminaws",
   database: "SplitWise",
+  // user: mysqlHost,
+  // host: mysqlUser,
+  // password: mysqlPassword,
+  // database: mysqlDatabase
 });
 
 //Allow Access Control
 app.use(function (req, res, next) {
   //   res.setHeader("Access-Control-Allow-Origin", frontendURI);
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -113,7 +119,7 @@ app.post("/login", function (req, res) {
       res.cookie("cookie", email, {
         maxAge: 900000,
         httpOnly: false,
-        path: "/"
+        path: "/",
       });
       req.session.user = result[0];
       res.send({ message: "login success" });
@@ -127,44 +133,105 @@ app.post("/creategroup", function (req, res) {
   const groupname = req.body.groupname;
   const friends = req.body.friends;
   const image = req.body.image;
-  db.query('select * from usersingroup where groupname = ?',[groupname],
-  (err,result) => {
-    if(err){
-      console.log(err);
-    }
-   if(result.length > 0){
-     res.send({message: 'Group with the same name already exists.'})
-   }
-   else{
-    for(var i=0;i<friends.length;i++){
-      console.log("In loop");
-      let email = friends[i].email;
-      db.query("select * from users where email = ?",[email],
-      (err, result3) =>{
-        if(err){
-          console.log(err);
-        }
-        if(result3.length === 1){
+  db.query(
+    "select * from usersingroup where groupname = ?",
+    [groupname],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      if (result.length > 0) {
+        res.send({ message: "Group with the same name already exists." });
+      } else {
+        for (var i = 0; i < friends.length; i++) {
+          let email = friends[i].email;
           db.query(
-            "insert into usersingroup (email, groupname) VALUES (?,?)",
-            [email, groupname],
-            (err, result2) => {
+            "select * from users where email = ?",
+            [email],
+            (err, result3) => {
               if (err) {
-                console.log(err);}
-             
+                console.log(err);
+              }
+              if (result3.length === 1) {
+                db.query(
+                  "insert into usersingroup (email, groupname) VALUES (?,?)",
+                  [email, groupname],
+                  (err, result2) => {
+                    if (err) {
+                      console.log(err);
+                    }
+                  }
+                );
+              }
             }
-          )
+          );
         }
-      })
-   
+        res.send({ message: "inserted users" });
+      }
     }
-    res.send({message: "inserted users"});
-   }
-  }
-  
   );
-  
 });
-  module.exports = app;
 
+app.get("/mygroups", function (req, res) {
+  const data = req.query;
 
+  db.query(
+    "select groupname from usersingroup where email = ?",
+    [data.email],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        // console.log("result of mygroups", Object.values(result));
+        const result2 = [];
+        for (var i = 0; i < result.length; i++) {
+          result2.push(result[i].groupname);
+        }
+        // console.log(result2);
+
+        res.send(result2);
+      }
+    }
+  );
+});
+
+app.get("/dashboard", function (req, res) {
+  const data = req.query;
+  db.query(
+    "select * from transaction where lenderid = ? or borrowerid = ?",
+    [data.email, data.email],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
+
+      // console.log(result2);
+      // console.log(result);
+
+      // res.send(result2);
+    }
+  );
+});
+
+app.post("/modal", function (req, res) {
+  const email = req.body.modalEmail;
+  const user = req.body.email;
+
+  console.log("lender id", email);
+  console.log("borrower id", user);
+  db.query(
+    "delete from transaction where lenderid= ? and borrowerid= ?",
+    [email, user],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("deleted successfully");
+      }
+    }
+  );
+});
+
+module.exports = app;

@@ -3,7 +3,8 @@ import { Navbar, Nav, Button } from "react-bootstrap";
 import head from "./logo.png";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
-import { Dropdown } from "react-bootstrap";
+import MyGroups from "../groups/MyGroups"
+import CenterPage from "../centerpage/CenterPage"
 
 class dashboard extends Component {
   constructor(props) {
@@ -23,9 +24,9 @@ class dashboard extends Component {
 
   render() {
     console.log(cookie.load("cookie"));
-    if (!cookie.load("cookie")) {
-      this.setState({ redirectVar: <Redirect to="/" /> });
-    }
+    // if (!cookie.load("cookie")) {
+      // this.setState({ redirectVar: <Redirect to="/" /> });
+    // }
 
     return (
       <div>
@@ -40,17 +41,7 @@ class dashboard extends Component {
               className="d-inline-block align-top"
             />
             <div class="split">Splitwise</div>
-            <div className="dropdown">
-              <Dropdown>
-                <Dropdown.Toggle variant="light" id="dropdown-basic">
-                  Manage Groups
-                </Dropdown.Toggle>
-                <Dropdown.Menu style={{ backgroundColor: "#73a47" }}>
-                  <Dropdown.Item href="/creategroup">Create a group</Dropdown.Item>
-                  <Dropdown.Item href="/mygroups">My Groups</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
+
             <Nav.Item className="ml-auto">
               <Button variant="info" onClick={this.landingPage}>
                 Logout
@@ -58,6 +49,10 @@ class dashboard extends Component {
             </Nav.Item>
           </Nav>
         </Navbar>
+        <div>
+        <CenterPage page={"Dashboard"} email={cookie.load("cookie")}/>
+        <MyGroups email={cookie.load("cookie")}/>
+        </div>
       </div>
     );
   }
