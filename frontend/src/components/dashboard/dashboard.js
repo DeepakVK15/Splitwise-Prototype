@@ -5,6 +5,7 @@ import { Redirect } from "react-router";
 import cookie from "react-cookies";
 import MyGroups from "../groups/MyGroups"
 import CenterPage from "../centerpage/CenterPage"
+import "./dashboard.css";
 
 class dashboard extends Component {
   constructor(props) {
@@ -24,9 +25,9 @@ class dashboard extends Component {
 
   render() {
     console.log(cookie.load("cookie"));
-    // if (!cookie.load("cookie")) {
-      // this.setState({ redirectVar: <Redirect to="/" /> });
-    // }
+    if (!cookie.load("cookie")) {
+      this.setState({ redirectVar: <Redirect to="/" /> });
+    }
 
     return (
       <div>
@@ -49,9 +50,9 @@ class dashboard extends Component {
             </Nav.Item>
           </Nav>
         </Navbar>
-        <div>
-        <CenterPage page={"Dashboard"} email={cookie.load("cookie")}/>
+        <div className="dashboard">
         <MyGroups email={cookie.load("cookie")}/>
+        <CenterPage page={"Dashboard"} email={cookie.load("cookie")}/> 
         </div>
       </div>
     );

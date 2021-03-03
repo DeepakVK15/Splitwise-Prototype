@@ -9,7 +9,8 @@ class CenterPage extends Component {
     super(props);
     this.state = {
       email: this.props.email,
-      transactions: [],
+      owedTransactions: [],
+      oweTransactions: [],
       isOpen: false,
       modalEmail: "",
     };
@@ -35,15 +36,29 @@ class CenterPage extends Component {
     window.location.reload(true);
   };
 
+  close = () =>{
+    this.setState({ isOpen: false });
+  }
+
   componentDidMount() {
     axios
-      .get("http://localhost:3001/dashboard/", {
+      .get("http://localhost:3001/lender/", {
         params: { email: this.state.email },
       })
       .then((response) => {
         //update the state with the response data
         this.setState({
-          transactions: this.state.transactions.concat(response.data),
+          owedTransactions: this.state.owedTransactions.concat(response.data),
+        });
+      });
+      axios
+      .get("http://localhost:3001/borrower/", {
+        params: { email: this.state.email },
+      })
+      .then((response) => {
+        //update the state with the response data
+        this.setState({
+          oweTransactions: this.state.oweTransactions.concat(response.data),
         });
       });
   }
@@ -55,31 +70,32 @@ class CenterPage extends Component {
     let oweList = [];
     let owedList = [];
     //if not logged in go to login page
-    for (var i = 0; i < this.state.transactions.length; i++) {
-      if (this.state.transactions[i].lenderid === this.state.email) {
-        total_amount += this.state.transactions[i].amount;
-        owed += this.state.transactions[i].amount;
+    for (let i = 0; i < this.state.owedTransactions.length; i++) {
+        total_amount += this.state.owedTransactions[i].amount;
+        owed += this.state.owedTransactions[i].amount;
         let obj = {
-          email: this.state.transactions[i].borrowerid,
-          amount: this.state.transactions[i].amount,
+          name: this.state.owedTransactions[i].borrowername,
+          amount: this.state.owedTransactions[i].amount,
+          group: this.state.owedTransactions[i].groupid
         };
         owedList.push(obj);
-      } else {
-        total_amount -= this.state.transactions[i].amount;
-        you_owe += this.state.transactions[i].amount;
+      }
+      for(let i=0;i<this.state.oweTransactions.length;i++){
+        total_amount -= this.state.oweTransactions[i].amount;
+        you_owe += this.state.oweTransactions[i].amount;
         let obj = {
-          email: this.state.transactions[i].lenderid,
-          amount: this.state.transactions[i].amount,
+          name: this.state.oweTransactions[i].lendername,
+          amount: this.state.oweTransactions[i].amount,
+          group: this.state.oweTransactions[i].groupid
         };
         oweList.push(obj);
       }
-    }
 
     let displayowedDetails = owedList.map((transaction) => {
       return (
         <div>
           <label>
-            {transaction.email} owes ${transaction.amount}
+            {transaction.name} owes you ${transaction.amount} for "{transaction.group}"
           </label>
           <br />
         </div>
@@ -90,7 +106,7 @@ class CenterPage extends Component {
       return (
         <div class="oweDetails">
           <label>
-            You owe ${transaction.amount} to {transaction.email}{" "}
+            You owe ${transaction.amount} to {transaction.name} for "{transaction.group}"
           </label>
           <br />
         </div>
@@ -99,7 +115,7 @@ class CenterPage extends Component {
 
     return (
       <div className="center">
-        <h2>{this.props.page}</h2>&nbsp; &nbsp;&nbsp;
+        <h4>{this.props.page}</h4>&nbsp; &nbsp;&nbsp;
         <Button variant="danger" className="buttons">
           Add an expense
         </Button>
@@ -107,14 +123,16 @@ class CenterPage extends Component {
         <Button variant="success" onClick={this.openModal}>
           Settle up
         </Button>
-        <label class="money">Total balance: ${total_amount}</label>
-        <label class="money">You owe: ${you_owe}</label>
-        <label class="money">You are owed: ${owed}</label>
+        <h5>Summary</h5>
+        <ul><label>Total balance: ${total_amount}</label></ul>
+        <ul><label>You owe: ${you_owe}</label></ul>
+       <ul> <label>You are owed: ${owed}</label></ul>
+        <h5>Details</h5>
         <div class="details">
           {displayowedDetails}
           {displayoweDetails}
         </div>
-        <Modal show={this.state.isOpen} onHide={this.closeModal}>
+        <Modal show={this.state.isOpen} onHide={this.close}>
           <Modal.Header closeButton>
             <Modal.Title>Settle up</Modal.Title>
           </Modal.Header>

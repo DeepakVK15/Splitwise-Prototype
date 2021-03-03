@@ -6,7 +6,7 @@ import login from "./components/login/login";
 import dashboard from "./components/dashboard/dashboard";
 import CreateGroup from "./components/groups/CreateGroup";
 import MyGroups from "./components/groups/MyGroups";
-
+import Group from "./components/groups/Group";
 
 
 class Main extends Component {
@@ -19,6 +19,7 @@ class Main extends Component {
         <Route exact path="/dashboard" component={dashboard} />
         <Route exact path="/creategroup" component={CreateGroup} />
         <Route exact path="/mygroups" component={MyGroups} />
+        <Route exact path="/group" component={Group} />
       </div>
     );
   }

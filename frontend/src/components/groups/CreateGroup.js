@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import head from "../login/logo.png";
-import { Button } from "react-bootstrap";
+import { Button,Nav } from "react-bootstrap";
 import "./creategroups.css";
 import axios from "axios";
 import { Redirect } from "react-router";
@@ -20,6 +20,8 @@ class CreateGroup extends Component {
     this.friendsHandler = this.friendsHandler.bind(this);
     this.imageHandler = this.imageHandler.bind(this);
     this.createGroup = this.createGroup.bind(this);
+    this.landingPage = this.landingPage.bind(this);
+
    
   }
 
@@ -47,6 +49,15 @@ class CreateGroup extends Component {
     }));
   }
 
+  landingPage = () => {
+    this.setState({ redirectVar: <Redirect to="/" /> });
+    cookie.remove("cookie");
+  };
+
+  dashBoard = () => {
+    this.setState({ redirectVar: <Redirect to="/dashboard" /> });
+  };
+  
   createUI() {
     return this.state.friends.map((el, i) => (
       <div>
@@ -112,6 +123,17 @@ class CreateGroup extends Component {
       <div>
         {errMsg}
         {this.state.redirectVar}
+        <Nav>
+        <Nav.Item className="ml-auto">
+            <Button variant="light" onClick={this.dashBoard}>
+                Dashboard
+              </Button>
+              <Button variant="success" onClick={this.landingPage}>
+                Logout
+              </Button>
+              
+            </Nav.Item>
+            </Nav>
         <img
           className="loginImage"
           alt=""

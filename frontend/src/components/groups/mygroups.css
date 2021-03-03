@@ -1,8 +1,6 @@
 .groups{
-    font-size: x-large;
-    color: gray;
-    margin-left: 250px;
-    margin-top: 100px;
+    font-size: large;
+    margin-left: 100px;
 
 }
 
@@ -10,6 +8,18 @@
     font-size: small;
     color: gray;
 }
-.groupButtons {
-    margin-left:250px;
+
+.expenses{
+    margin-left:500px
+}
+
+.logout {
+    margin-left:900px
+}
+.head{
+    margin-left:400px
+}
+
+.button{
+    margin-left:100px
 }

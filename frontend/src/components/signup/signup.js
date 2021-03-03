@@ -4,6 +4,8 @@ import "./signup.css";
 import axios from "axios";
 import { Redirect } from "react-router";
 import validator from "validator";
+import Cookies from 'universal-cookie';
+
 
 class signup extends Component {
   constructor(props) {
@@ -72,6 +74,8 @@ class signup extends Component {
     let errMsg = null;
 
     if (this.state.errCode === "sign up success") {
+      const cookies = new Cookies();
+      cookies.set('cookie', this.state.email, { path: '/' });
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
       this.state.errCode === "Enter a valid email address." ||
