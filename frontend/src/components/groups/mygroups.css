@@ -10,8 +10,19 @@
 }
 
 .expenses{
-    margin-left:500px
+    margin-left:500px;
+    
 }
+.group{
+    display:flex; flex-direction:row;
+    margin-left: 125px;
+}
+
+.groupBalance{
+    margin-left: 300px;
+    color: grey;
+}
+
 
 .logout {
     margin-left:900px

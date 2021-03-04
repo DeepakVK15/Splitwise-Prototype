@@ -36,9 +36,9 @@ class CenterPage extends Component {
     window.location.reload(true);
   };
 
-  close = () =>{
+  close = () => {
     this.setState({ isOpen: false });
-  }
+  };
 
   componentDidMount() {
     axios
@@ -51,7 +51,7 @@ class CenterPage extends Component {
           owedTransactions: this.state.owedTransactions.concat(response.data),
         });
       });
-      axios
+    axios
       .get("http://localhost:3001/borrower/", {
         params: { email: this.state.email },
       })
@@ -71,31 +71,32 @@ class CenterPage extends Component {
     let owedList = [];
     //if not logged in go to login page
     for (let i = 0; i < this.state.owedTransactions.length; i++) {
-        total_amount += this.state.owedTransactions[i].amount;
-        owed += this.state.owedTransactions[i].amount;
-        let obj = {
-          name: this.state.owedTransactions[i].borrowername,
-          amount: this.state.owedTransactions[i].amount,
-          group: this.state.owedTransactions[i].groupid
-        };
-        owedList.push(obj);
-      }
-      for(let i=0;i<this.state.oweTransactions.length;i++){
-        total_amount -= this.state.oweTransactions[i].amount;
-        you_owe += this.state.oweTransactions[i].amount;
-        let obj = {
-          name: this.state.oweTransactions[i].lendername,
-          amount: this.state.oweTransactions[i].amount,
-          group: this.state.oweTransactions[i].groupid
-        };
-        oweList.push(obj);
-      }
+      total_amount += this.state.owedTransactions[i].amount;
+      owed += this.state.owedTransactions[i].amount;
+      let obj = {
+        name: this.state.owedTransactions[i].borrowername,
+        amount: this.state.owedTransactions[i].amount,
+        group: this.state.owedTransactions[i].groupid,
+      };
+      owedList.push(obj);
+    }
+    for (let i = 0; i < this.state.oweTransactions.length; i++) {
+      total_amount -= this.state.oweTransactions[i].amount;
+      you_owe += this.state.oweTransactions[i].amount;
+      let obj = {
+        name: this.state.oweTransactions[i].lendername,
+        amount: this.state.oweTransactions[i].amount,
+        group: this.state.oweTransactions[i].groupid,
+      };
+      oweList.push(obj);
+    }
 
     let displayowedDetails = owedList.map((transaction) => {
       return (
         <div>
           <label>
-            {transaction.name} owes you ${transaction.amount} for "{transaction.group}"
+            {transaction.name} owes you ${transaction.amount} for "
+            {transaction.group}"
           </label>
           <br />
         </div>
@@ -106,7 +107,8 @@ class CenterPage extends Component {
       return (
         <div class="oweDetails">
           <label>
-            You owe ${transaction.amount} to {transaction.name} for "{transaction.group}"
+            You owe ${transaction.amount} to {transaction.name} for "
+            {transaction.group}"
           </label>
           <br />
         </div>
@@ -124,9 +126,16 @@ class CenterPage extends Component {
           Settle up
         </Button>
         <h5>Summary</h5>
-        <ul><label>Total balance: ${total_amount}</label></ul>
-        <ul><label>You owe: ${you_owe}</label></ul>
-       <ul> <label>You are owed: ${owed}</label></ul>
+        <ul>
+          <label>Total balance: ${total_amount}</label>
+        </ul>
+        <ul>
+          <label>You owe: ${you_owe}</label>
+        </ul>
+        <ul>
+          {" "}
+          <label>You are owed: ${owed}</label>
+        </ul>
         <h5>Details</h5>
         <div class="details">
           {displayowedDetails}

@@ -232,23 +232,25 @@ app.post("/modal", function (req, res) {
   console.log("lender id", email);
   console.log("borrower id", user);
   db.query(
-    "delete from transaction where lenderid= ? and borrowerid= ?",
+    "delete from SplitWise.transaction where lenderid= ? and borrowerid= ?",
     [email, user],
     (err, result) => {
       if (err) {
         console.log(err);
       } else {
+        console.log("Result ", result);
         console.log("deleted successfully");
       }
     }
   );
 });
 
-app.get('/group',function(req,res){
+app.get("/group", function (req, res) {
   const groupname = req.query.name;
-  console.log("Group name is", groupname)
+  console.log("Group name is", groupname);
 
-  db.query("select expense.description, expense.paid_by, expense.group_name, expense.amount, expense.date, users.name as name from SplitWise.expense inner join SplitWise.users on expense.paid_by = users.email and expense.group_name= ? order by expense.date desc",
+  db.query(
+    "select expense.description, expense.paid_by, expense.group_name, expense.amount, expense.date, users.name as name from SplitWise.expense inner join SplitWise.users on expense.paid_by = users.email and expense.group_name= ? order by expense.date desc",
     [groupname],
     (err, result) => {
       if (err) {
@@ -257,52 +259,57 @@ app.get('/group',function(req,res){
         console.log("Result:", result);
         res.send(result);
       }
-
     }
   );
+});
 
-})
-
-app.post("/group",function(req,res){
+app.post("/group", function (req, res) {
   const desc = req.body.description;
   const paid_by = req.body.paid_by;
   const group_name = req.body.groupname;
   const amount = req.body.amount;
-  const date = req.body.date
+  const date = req.body.date;
 
   console.log("Paid_By:", paid_by);
-  db.query("insert into expense (description, paid_by, group_name, amount, date) VALUES (?,?,?,?,?)", [desc, paid_by, group_name, amount, date],
-  (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Result:", result);
-      res.send(result);
-    }
-  })
-  db.query("select email from usersingroup where groupname =?",[group_name],
-  (err, result) => {
-    if (err) {
-      console.log(err);
-    } 
-    else {
-      const individualContribution = amount/(result.length);
-      for(var i=0;i<result.length;i++){
-        if(result[i].email!=paid_by){
-        db.query("insert into transaction (lenderid, borrowerid, groupid, amount, date) VALUES (?,?,?,?, now())",[paid_by, result[i].email, group_name, individualContribution]);
+  db.query(
+    "insert into expense (description, paid_by, group_name, amount, date) VALUES (?,?,?,?,?)",
+    [desc, paid_by, group_name, amount, date],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Result:", result);
+        res.send(result);
       }
     }
-
-  }
-})
-  
-  })
-
-app.get('/members',function(req,res){
-  const groupname = req.query.name;
-  console.log("Group name: ",groupname)
+  );
   db.query(
-    "select users.name from SplitWise.usersingroup inner join SplitWise.users on usersingroup.email = users.email where groupname = ?",[groupname],
+    "select email from usersingroup where groupname =?",
+    [group_name],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const individualContribution = amount / result.length;
+        for (var i = 0; i < result.length; i++) {
+          if (result[i].email != paid_by) {
+            db.query(
+              "insert into transaction (lenderid, borrowerid, groupid, amount, date) VALUES (?,?,?,?, now())",
+              [paid_by, result[i].email, group_name, individualContribution]
+            );
+          }
+        }
+      }
+    }
+  );
+});
+
+app.get("/members", function (req, res) {
+  const groupname = req.query.name;
+  console.log("Group name: ", groupname);
+  db.query(
+    "select users.name,users.email from SplitWise.usersingroup inner join SplitWise.users on usersingroup.email = users.email where groupname = ?",
+    [groupname],
     (err, result) => {
       if (err) {
         console.log(err);
@@ -310,48 +317,63 @@ app.get('/members',function(req,res){
         console.log("Group Members", result);
         res.send(result);
       }
-
     }
   );
-  });
+});
 
-app.get("/groupbalances", function(req,res){
+app.get("/groupbalances", function (req, res) {
+  const groupname = req.query.groupname;
+  let balance = [];
+  let obj = null;
 
-    const groupname = req.query.groupname;
-    let finalResult = [];
-    let balance = [];
-    
-    
-    // for(let i=0;i<names.length;i++)
-    db.query("select email from SplitWise.usersingroup where groupname = ?",[groupname],
+  db.query(
+    "select usersingroup.email, users.name from SplitWise.usersingroup inner join SplitWise.users on usersingroup.email = users.email where groupname = ?",
+    [groupname],
     (err, result) => {
       if (err) {
         console.log(err);
       } else {
-        console.log("Group Members12", result); 
-        for(let i=0;i<result.length;i++){
-        db.query("select users.name, SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where borrowerid = ? and groupid=?",[result[i].email, groupname],
-        (err, result2) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Group Members", result2); 
-          }
-        })
-        db.query("select users.name, SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where lenderid = ? and groupid=?",[result[i].email, groupname],
-        (err, result3) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Group Members", result3);
-          }
+        console.log("Group Members12", result);
+        for (let i = 0; i < result.length; i++) {
+          db.query(
+            "select coalesce((select SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where lenderid = ? and groupid=?), 0)- coalesce((select SUM(amount) as reduce from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where borrowerid = ? and groupid=?), 0) as balance;",
+            [result[i].email, groupname, result[i].email, groupname],
+
+            (err, result2) => {
+              if (err) {
+                console.log(err);
+              } else {
+                obj = {
+                  name: result[i].name,
+                  balance: result2[0].balance,
+                };
+                balance.push(obj);
+                if (i === result.length - 1) {
+                  res.send(balance);
+                }
+              }
+              console.log("Balance is", balance);
+            }
+          );
         }
-    )
-      }}
-    }
-          )
-    // res.send(balance);
       }
-);
+    }
+  );
+});
+
+app.post("/settleup", function(req,res){
+  const email= req.body.name;
+  console.log("Borrower ID", email)
+  db.query("delete from SplitWise.transaction where borrowerid= ?", [email],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Result ", result);
+        console.log("deleted successfully");
+      }
+    }
+  );
+})
 
 module.exports = app;

@@ -61,6 +61,7 @@ class Group extends Component {
         this.setState({
           expenses: this.state.expenses.concat(response.data),
         });
+        console.log("Expenses in group",this.state.expenses)
       });
     axios
       .get("http://localhost:3001/members", {
@@ -70,12 +71,21 @@ class Group extends Component {
         this.setState({
           members: this.state.members.concat(response.data),
         });
+      });
+      axios.get("http://localhost:3001/groupbalances",
+                {params: {groupname:this.state.name},
+      }).then((response) => {
+        this.setState({
+          groupBalance: this.state.groupBalance.concat(response.data),
+        });
       })
            
   }
 
   openModal = () => this.setState({ isOpen: true });
   closeModal = () => {
+   
+    console.log("Paid by in group", this.state.paidmember);
     const data = {
       description: this.state.description,
       paid_by: this.state.paidmember,
@@ -100,18 +110,13 @@ class Group extends Component {
     this.setState({ redirectVar: <Redirect to="/dashboard" /> });
   };
 
-  testBalance = () => {
-    axios.get("http://localhost:3001/groupbalances",
-                {params: {names:this.state.members, groupname:this.state.name},
-      }).then((response)=>{
-          const obj ={
-              name : "deepak@gmail.com",
-              balance : response.data
-          }
-          this.state.groupBalance.push(obj);
-      })
+  settleUp = () =>{
+    const data ={
+      name:cookie.load("cookie")
+    }
+    axios.post("http://localhost:3001/settleup",data);
+     window.location.reload(true);
   }
-
 
 
   render() {
@@ -124,6 +129,25 @@ class Group extends Component {
     
     if (expenses.length === 0) {
       expenses = <h4>No expenses to show.</h4>;
+    }
+
+    let balance = [];
+    for(let i=0;i<this.state.groupBalance.length;i++){
+      if(this.state.groupBalance[i].balance!==null && this.state.groupBalance[i].balance!=0){
+      if(this.state.groupBalance[i].balance > 0){
+       balance.push( <h6>
+        {this.state.groupBalance[i].name} gets back ${this.state.groupBalance[i].balance}
+        </h6>)
+      }
+      else{
+        this.state.groupBalance[i].balance = Math.abs(this.state.groupBalance[i].balance)
+        balance.push(
+        <h6>
+        {this.state.groupBalance[i].name} owes ${this.state.groupBalance[i].balance}
+        </h6>)
+      }
+      
+    }
     }
 
     return (
@@ -189,7 +213,7 @@ class Group extends Component {
                 id="paidmember"
               >
                 {this.state.members.map((member) => {
-                  return <option value={member.name}> {member.name} </option>;
+                  return <option value={member.email}> {member.name} </option>;
                 })}
               </select>
               <br />
@@ -209,6 +233,7 @@ class Group extends Component {
             </Button>
           </Modal.Footer>
         </Modal>
+        <div class ="group">
         <div className="expenses">
           <h5>Expenses: </h5>
           <br />
@@ -218,15 +243,16 @@ class Group extends Component {
           <br />
           <Button variant="danger" onClick={this.openModal}>
             Add an expense
-          </Button> <Button variant="success" >
+          </Button> <Button variant="success" onClick={this.settleUp} >
           Settle up
         </Button>
-        <Button variant="success" onClick={this.testBalance} >
-          Balances
-        </Button>
-          
-        </div>
+
       </div>
+      <div className="groupBalance">
+      <label>Group Balance</label>
+        {balance}</div>
+          </div>
+        </div>
     );
   }
 }
