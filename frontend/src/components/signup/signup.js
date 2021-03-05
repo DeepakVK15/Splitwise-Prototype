@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import head from "./logo.png";
 import "./signup.css";
-import axios from "axios";
 import { Redirect } from "react-router";
 import validator from "validator";
 import Cookies from 'universal-cookie';
+import { connect } from 'react-redux';
+import {userSignup}from "../../actions/signupAction" 
 
 
 class signup extends Component {
@@ -16,7 +17,7 @@ class signup extends Component {
       name: "",
       email: "",
       password: "",
-      errCode: "",
+      message: "",
     };
 
     this.nameChangeHandler = this.nameChangeHandler.bind(this);
@@ -49,43 +50,38 @@ class signup extends Component {
     const data = {
       name: this.state.name,
       email: this.state.email,
-      password: this.state.password,
+      password: this.state.password
     };
 
     if (!validator.isEmail(data.email)) {
-      this.setState({ errCode: "Enter a valid email address." });
+      this.setState({ message: "Enter a valid email address." });
     } else if (data.name === "") {
-      this.setState({ errCode: "Enter a name." });
+      this.setState({ message: "Enter a name." });
     } else if (data.password.length < 8) {
-      this.setState({ errCode: "Password length must be 8 or more." });
+      this.setState({ message: "Password length must be 8 or more." });
     } else {
-      axios.post("http://localhost:3001/signup", data).then((response) => {
-        // eslint-disable-next-line react/no-direct-mutation-state
-        // this.setState({errCode :response.status})
-        if (response.data.message) {
-          this.setState({ errCode: response.data.message });
-          console.log(this.state.errCode);
-        }
-      });
+    
+      this.props.userSignup(data);
+
     }
   };
   render() {
     let redirectVar = null;
     let errMsg = null;
 
-    if (this.state.errCode === "sign up success") {
+    if (this.props.user && this.props.user.message === "sign up success") {
       const cookies = new Cookies();
       cookies.set('cookie', this.state.email, { path: '/' });
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
-      this.state.errCode === "Enter a valid email address." ||
-      this.state.errCode === "Account with email id already exists." ||
-      this.state.errCode === "Enter a name." ||
-      this.state.errCode === "Password length must be 8 or more."
+      this.props.user.message === "Enter a valid email address." ||
+      this.props.user.message === "Account with email id already exists." ||
+      this.props.user.message === "Enter a name." ||
+      this.props.user.message === "Password length must be 8 or more."
     ) {
       errMsg = (
         <div class="alert alert-danger" role="alert">
-          {this.state.errCode}
+          {this.props.user.message}
         </div>
       );
     }
@@ -130,7 +126,7 @@ class signup extends Component {
             <br />
             <br />
             <a href="http://localhost:3000/login">
-              Already have account? Sign In
+              Already have an account? Sign In
             </a>
           </div>
         </form>
@@ -138,4 +134,10 @@ class signup extends Component {
     );
   }
 }
-export default signup;
+
+const mapStateToProps = state => { 
+  return ({
+  user: state.signup.user
+})};
+export default connect(mapStateToProps, {userSignup})(signup);
+// export default signup;

@@ -4,7 +4,9 @@ import head from "./logo.png";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
 import MyGroups from "../groups/MyGroups"
+import {userLogout}from "../../actions/loginAction" 
 import CenterPage from "../centerpage/CenterPage"
+import { connect } from 'react-redux';
 import "./dashboard.css";
 
 class dashboard extends Component {
@@ -21,6 +23,7 @@ class dashboard extends Component {
   landingPage = () => {
     this.setState({ redirectVar: <Redirect to="/" /> });
     cookie.remove("cookie");
+    this.props.userLogout();
   };
 
   render() {
@@ -59,4 +62,7 @@ class dashboard extends Component {
   }
 }
 
-export default dashboard;
+const mapStateToProps = (response) => ({response});
+
+
+export default connect(mapStateToProps, {userLogout})(dashboard);
