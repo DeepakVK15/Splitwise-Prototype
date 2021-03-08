@@ -376,4 +376,40 @@ app.post("/settleup", function(req,res){
   );
 })
 
+app.post("/leaveGroup", function(req, res){
+  const name = req.body.name;
+  const groupname = req.body.groupname;
+  db.query("select coalesce((select SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where lenderid = ? and groupid=?), 0)- coalesce((select SUM(amount) as reduce from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where borrowerid = ? and groupid=?), 0) as balance;",
+  [name,groupname,name,groupname],
+  (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Result is", result[0].balance);
+      if(result[0].balance === "0"){
+        console.log("after balance=0");
+        db.query("delete from SplitWise.usersingroup where email= ? and groupname=?", [name, groupname],
+        (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Is it coming here.");
+            res.send("Exited from group");
+          }
+        }
+      );
+      }
+      else{
+        if(result[0].balance > 0){
+        res.send("Please wait to recieve the remaining amount.");
+      }
+      else if(result[0].balance < 0){
+        res.send("Please clear your dues to leave the group.");
+      }
+    }
+  }
+  })
+});
+
+
 module.exports = app;

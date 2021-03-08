@@ -19,7 +19,9 @@ class Group extends Component {
       amount: "",
       date: null,
       redirectVar: null,
-      groupBalance:[]
+      groupBalance: [],
+      message: "",
+      userBalance:[]
     };
     this.descriptionHandler = this.descriptionHandler.bind(this);
     this.amountHandler = this.amountHandler.bind(this);
@@ -49,19 +51,17 @@ class Group extends Component {
     });
   };
 
- 
-
   componentDidMount() {
     axios
       .get("http://localhost:3001/group/", {
-        params: { name: this.state.name}
+        params: { name: this.state.name },
       })
       .then((response) => {
         // update the state with the response data
         this.setState({
           expenses: this.state.expenses.concat(response.data),
         });
-        console.log("Expenses in group",this.state.expenses)
+        console.log("Expenses in group", this.state.expenses);
       });
     axios
       .get("http://localhost:3001/members", {
@@ -72,19 +72,19 @@ class Group extends Component {
           members: this.state.members.concat(response.data),
         });
       });
-      axios.get("http://localhost:3001/groupbalances",
-                {params: {groupname:this.state.name},
-      }).then((response) => {
+    axios
+      .get("http://localhost:3001/groupbalances", {
+        params: { groupname: this.state.name },
+      })
+      .then((response) => {
         this.setState({
           groupBalance: this.state.groupBalance.concat(response.data),
         });
-      })
-           
+      });
   }
 
   openModal = () => this.setState({ isOpen: true });
   closeModal = () => {
-   
     console.log("Paid by in group", this.state.paidmember);
     const data = {
       description: this.state.description,
@@ -110,44 +110,87 @@ class Group extends Component {
     this.setState({ redirectVar: <Redirect to="/dashboard" /> });
   };
 
-  settleUp = () =>{
-    const data ={
-      name:cookie.load("cookie")
-    }
-    axios.post("http://localhost:3001/settleup",data);
-     window.location.reload(true);
-  }
+  settleUp = () => {
+    const data = {
+      name: cookie.load("cookie"),
+    };
+    axios.post("http://localhost:3001/settleup", data);
+    window.location.reload(true);
+  };
 
+  leaveGroup = () => {
+    console.log("in leavegroup");
+    const data = {
+      name: cookie.load("cookie"),
+      groupname: this.state.name,
+    };
+    axios.post("http://localhost:3001/leaveGroup", data).then((response) => {
+      this.setState({
+        message: response.data
+      });
+    });
+    console.log("Exit: ",this.state.message);
+   
+  };
 
   render() {
+    let errMsg = null;
+    console.log("message ",this.state.message);
+    if (this.state.message === "Exited from group") {
+      this.setState({ redirectVar: <Redirect to="/dashboard" /> });
+    } 
+     if (
+      this.state.message === "Please wait to recieve the remaining amount."
+    ) {
+      errMsg = (
+        <div class="alert alert-danger" role="alert">
+          {this.state.message}
+        </div>
+      );
+    }
+    else if(this.state.message === "Please clear your dues to leave the group."){
+     errMsg = (
+        <div class="alert alert-danger" role="alert">
+          {this.state.message}
+        </div>
+      );
+    }
+
     let expenses = this.state.expenses.map((expense) => (
       <h6>
         {expense.date.split("T")[0]} &nbsp; {expense.description} &nbsp;{" "}
         {expense.name} &nbsp;${expense.amount}
       </h6>
     ));
-    
+
     if (expenses.length === 0) {
       expenses = <h4>No expenses to show.</h4>;
     }
 
     let balance = [];
-    for(let i=0;i<this.state.groupBalance.length;i++){
-      if(this.state.groupBalance[i].balance!==null && this.state.groupBalance[i].balance!=0){
-      if(this.state.groupBalance[i].balance > 0){
-       balance.push( <h6>
-        {this.state.groupBalance[i].name} gets back ${this.state.groupBalance[i].balance}
-        </h6>)
+    for (let i = 0; i < this.state.groupBalance.length; i++) {
+      if (
+        this.state.groupBalance[i].balance !== null &&
+        this.state.groupBalance[i].balance != 0
+      ) {
+        if (this.state.groupBalance[i].balance > 0) {
+          balance.push(
+            <h6>
+              {this.state.groupBalance[i].name} gets back $
+              {this.state.groupBalance[i].balance}
+            </h6>
+          );
+        } else {
+          let temp = Math.abs(
+            this.state.groupBalance[i].balance);
+          balance.push(
+            <h6>
+              {this.state.groupBalance[i].name} owes $
+              {temp}
+            </h6>
+          );
+        }
       }
-      else{
-        this.state.groupBalance[i].balance = Math.abs(this.state.groupBalance[i].balance)
-        balance.push(
-        <h6>
-        {this.state.groupBalance[i].name} owes ${this.state.groupBalance[i].balance}
-        </h6>)
-      }
-      
-    }
     }
 
     return (
@@ -174,6 +217,7 @@ class Group extends Component {
             </Nav.Item>
           </Nav>
         </Navbar>
+        {errMsg}
         <div className="head">
           <h4>{this.state.name}</h4>
           <br />
@@ -233,26 +277,30 @@ class Group extends Component {
             </Button>
           </Modal.Footer>
         </Modal>
-        <div class ="group">
-        <div className="expenses">
-          <h5>Expenses: </h5>
-          <br />
-          <br />
-          {expenses}
-          <br /> <br />
-          <br />
-          <Button variant="danger" onClick={this.openModal}>
-            Add an expense
-          </Button> <Button variant="success" onClick={this.settleUp} >
-          Settle up
-        </Button>
-
-      </div>
-      <div className="groupBalance">
-      <label>Group Balance</label>
-        {balance}</div>
+        <div class="group">
+          <div className="expenses">
+            <h5>Expenses: </h5>
+            <br />
+            <br />
+            {expenses}
+            <br /> <br />
+            <br />
+            <Button variant="danger" onClick={this.openModal}>
+              Add an expense
+            </Button>{" "}
+            <Button variant="success" onClick={this.settleUp}>
+              Settle up
+            </Button>{" "}
+            <Button variant="dark" onClick={this.leaveGroup}>
+              Leave Group{" "}
+            </Button>
+          </div>
+          <div className="groupBalance">
+            <label>Group Balance</label>
+            {balance}
           </div>
         </div>
+      </div>
     );
   }
 }
