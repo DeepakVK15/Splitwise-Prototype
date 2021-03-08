@@ -21,7 +21,6 @@ class Group extends Component {
       redirectVar: null,
       groupBalance: [],
       message: "",
-      userBalance:[]
     };
     this.descriptionHandler = this.descriptionHandler.bind(this);
     this.amountHandler = this.amountHandler.bind(this);
