@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import head from "../login/logo.png";
-import { Button,Nav } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import "./creategroups.css";
 import axios from "axios";
 import { Redirect } from "react-router";
-import cookie from "react-cookies";
+import cookie  from "react-cookies";
+import Head from "../Heading/Heading"
+
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -14,7 +16,7 @@ class CreateGroup extends Component {
       groupname: "",
       image: null,
       errCode: "",
-      redirectVar: "",
+      redirectVar: null,
     };
     this.groupnameHandler = this.groupnameHandler.bind(this);
     this.friendsHandler = this.friendsHandler.bind(this);
@@ -88,15 +90,21 @@ class CreateGroup extends Component {
   }
 
   createGroup() {
+     if(this.state.groupname===""){
+      this.setState({errCode:"Group should have a name."});
+    }
+    else if(this.state.friends.length < 2){
+      this.setState({errCode: "Group should have two or more members."})
+    }
+    
+    else{
     const data = {
       groupname: this.state.groupname,
       friends: this.state.friends,
       image: this.state.image,
+      email: cookie.load("cookie")
     };
-    const obj = {
-      email: cookie.load("cookie"),
-    }
-    this.state.friends.push(obj)
+  
     axios.defaults.withCredentials = true;
     axios.post("http://localhost:3001/creategroup", data).then((response) => {
       // eslint-disable-next-line react/no-direct-mutation-state
@@ -106,10 +114,12 @@ class CreateGroup extends Component {
       }
     });
   }
+  }
 
   render() {
     let errMsg = null;
-    if (this.state.errCode === "Group with the same name already exists.") {
+    if (this.state.errCode === "Group with the same name already exists." || 
+    this.state.errCode === "Group should have two or more members." || this.state.errCode === "Group should have a name.") {
       errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.errCode}
@@ -123,17 +133,7 @@ class CreateGroup extends Component {
       <div>
         {errMsg}
         {this.state.redirectVar}
-        <Nav>
-        <Nav.Item className="ml-auto">
-            <Button variant="light" onClick={this.dashBoard}>
-                Dashboard
-              </Button>
-              <Button variant="success" onClick={this.landingPage}>
-                Logout
-              </Button>
-              
-            </Nav.Item>
-            </Nav>
+        <Head />
         <img
           className="loginImage"
           alt=""

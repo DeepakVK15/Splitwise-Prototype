@@ -1,7 +1,6 @@
 .groups{
-    font-size: large;
-    margin-left: 100px;
-
+    margin-left: 600px;
+    margin-top:75px
 }
 
 .addButton {
@@ -33,4 +32,24 @@
 
 .button{
     margin-left:100px
+}
+
+.mygroups{
+    font-size: x-large;
+    color: grey;
+    display:flex; 
+    flex-direction:row;
+     margin-left:500px
+    }
+
+.invites{
+    margin-left: 400px;
+    font-size: medium;
+    margin-top:50px
+}
+
+.inviteButton {
+    width: 3vw;
+    height: 2vw;
+    display: inline-block;
 }

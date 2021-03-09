@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { Component } from "react";
-import { Modal, Button, Navbar, Nav } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import cookie from "react-cookies";
 import "./mygroups.css";
-import head from "./logo.png";
 import { Redirect } from "react-router";
+import Head from "../Heading/Heading";
 
 class Group extends Component {
   constructor(props) {
@@ -92,6 +92,7 @@ class Group extends Component {
       amount: this.state.amount,
       date: this.state.date,
     };
+    console.log("Amount is", data.amount);
     axios.post("http://localhost:3001/group", data);
 
     this.setState({ isOpen: false });
@@ -125,30 +126,28 @@ class Group extends Component {
     };
     axios.post("http://localhost:3001/leaveGroup", data).then((response) => {
       this.setState({
-        message: response.data
+        message: response.data,
       });
     });
-    console.log("Exit: ",this.state.message);
-   
+    console.log("Exit: ", this.state.message);
   };
 
   render() {
     let errMsg = null;
-    console.log("message ",this.state.message);
+    console.log("message ", this.state.message);
     if (this.state.message === "Exited from group") {
       this.setState({ redirectVar: <Redirect to="/dashboard" /> });
-    } 
-     if (
-      this.state.message === "Please wait to recieve the remaining amount."
-    ) {
+    }
+    if (this.state.message === "Please wait to recieve the remaining amount.") {
       errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.message}
         </div>
       );
-    }
-    else if(this.state.message === "Please clear your dues to leave the group."){
-     errMsg = (
+    } else if (
+      this.state.message === "Please clear your dues to leave the group."
+    ) {
+      errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.message}
         </div>
@@ -180,12 +179,10 @@ class Group extends Component {
             </h6>
           );
         } else {
-          let temp = Math.abs(
-            this.state.groupBalance[i].balance);
+          let temp = Math.abs(this.state.groupBalance[i].balance);
           balance.push(
             <h6>
-              {this.state.groupBalance[i].name} owes $
-              {temp}
+              {this.state.groupBalance[i].name} owes ${temp}
             </h6>
           );
         }
@@ -195,27 +192,7 @@ class Group extends Component {
     return (
       <div class="addexpense">
         {this.state.redirectVar}
-        <Navbar bg="light" variant="light">
-          <Nav className="container-fluid">
-            <img
-              alt=""
-              src={head}
-              width="40"
-              height="40"
-              className="d-inline-block align-top"
-            />
-            <div class="split">Splitwise</div>
-
-            <Nav.Item className="ml-auto">
-              <Button variant="light" onClick={this.dashBoard}>
-                Dashboard
-              </Button>
-              <Button variant="success" onClick={this.landingPage}>
-                Logout
-              </Button>
-            </Nav.Item>
-          </Nav>
-        </Navbar>
+        <Head />
         {errMsg}
         <div className="head">
           <h4>{this.state.name}</h4>

@@ -3,10 +3,9 @@ import head from "./logo.png";
 import "./signup.css";
 import { Redirect } from "react-router";
 import validator from "validator";
-import Cookies from 'universal-cookie';
-import { connect } from 'react-redux';
-import {userSignup}from "../../actions/signupAction" 
-
+import Cookies from "universal-cookie";
+import { connect } from "react-redux";
+import { userSignup } from "../../actions/signupAction";
 
 class signup extends Component {
   constructor(props) {
@@ -50,38 +49,39 @@ class signup extends Component {
     const data = {
       name: this.state.name,
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
     };
+    console.log("Lets see the password,", data.password);
 
     if (!validator.isEmail(data.email)) {
       this.setState({ message: "Enter a valid email address." });
+      console.log("validate email", data.email);
     } else if (data.name === "") {
       this.setState({ message: "Enter a name." });
     } else if (data.password.length < 8) {
       this.setState({ message: "Password length must be 8 or more." });
     } else {
-    
       this.props.userSignup(data);
-
     }
   };
   render() {
     let redirectVar = null;
     let errMsg = null;
+    console.log("Message after signup", this.props.user.message);
 
     if (this.props.user && this.props.user.message === "sign up success") {
       const cookies = new Cookies();
-      cookies.set('cookie', this.state.email, { path: '/' });
+      cookies.set("cookie", this.state.email, { path: "/" });
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
-      this.props.user.message === "Enter a valid email address." ||
-      this.props.user.message === "Account with email id already exists." ||
-      this.props.user.message === "Enter a name." ||
-      this.props.user.message === "Password length must be 8 or more."
+      this.state.message === "Enter a valid email address." ||
+      this.state.message === "Account with email id already exists." ||
+      this.state.message === "Enter a name." ||
+      this.state.message === "Password length must be 8 or more."
     ) {
       errMsg = (
         <div class="alert alert-danger" role="alert">
-          {this.props.user.message}
+          {this.state.message}
         </div>
       );
     }
@@ -135,9 +135,10 @@ class signup extends Component {
   }
 }
 
-const mapStateToProps = state => { 
-  return ({
-  user: state.signup.user
-})};
-export default connect(mapStateToProps, {userSignup})(signup);
+const mapStateToProps = (state) => {
+  return {
+    user: state.signup.user,
+  };
+};
+export default connect(mapStateToProps, { userSignup })(signup);
 // export default signup;

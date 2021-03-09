@@ -1,1 +1,9 @@
-.dashboard{display:flex; flex-direction:row;}
+.dashboard{
+    display:flex; 
+    flex-direction:row;
+     margin-left:300px
+    }
+
+.dropdown{
+    margin-left: 1200px;
+}

@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import { Navbar, Nav, Button } from "react-bootstrap";
+import { Dropdown,Navbar, Nav, Button } from "react-bootstrap";
 import head from "./logo.png";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
-import MyGroups from "../groups/MyGroups"
 import {userLogout}from "../../actions/loginAction" 
 import CenterPage from "../centerpage/CenterPage"
 import { connect } from 'react-redux';
@@ -45,8 +44,19 @@ class dashboard extends Component {
               className="d-inline-block align-top"
             />
             <div class="split">Splitwise</div>
+            <Dropdown className="dropdown">
+            <Dropdown.Toggle variant="info" id="dropdown-basic">
+                Manage Groups
+            </Dropdown.Toggle>
+          
+            <Dropdown.Menu>
+              <Dropdown.Item href="/creategroup">Create Group</Dropdown.Item>
+              <Dropdown.Item href="/mygroups">My Groups</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
 
             <Nav.Item className="ml-auto">
+ 
               <Button variant="info" onClick={this.landingPage}>
                 Logout
               </Button>
@@ -54,7 +64,6 @@ class dashboard extends Component {
           </Nav>
         </Navbar>
         <div className="dashboard">
-        <MyGroups email={cookie.load("cookie")}/>
         <CenterPage page={"Dashboard"} email={cookie.load("cookie")}/> 
         </div>
       </div>

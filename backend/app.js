@@ -133,6 +133,7 @@ app.post("/creategroup", function (req, res) {
   const groupname = req.body.groupname;
   const friends = req.body.friends;
   const image = req.body.image;
+  const email = req.body.email;
   db.query(
     "select * from usersingroup where groupname = ?",
     [groupname],
@@ -143,19 +144,23 @@ app.post("/creategroup", function (req, res) {
       if (result.length > 0) {
         res.send({ message: "Group with the same name already exists." });
       } else {
+        db.query(
+          "insert into SplitWise.usersingroup(email,groupname) VALUES (?,?)",
+          [email, groupname]
+        );
         for (var i = 0; i < friends.length; i++) {
-          let email = friends[i].email;
+          let friend = friends[i].email;
           db.query(
             "select * from users where email = ?",
-            [email],
+            [friend],
             (err, result3) => {
               if (err) {
                 console.log(err);
               }
-              if (result3.length === 1) {
+              if (result3.length === 1 && friend !== email) {
                 db.query(
-                  "insert into usersingroup (email, groupname) VALUES (?,?)",
-                  [email, groupname],
+                  "insert into invite (invite_by, invite_to, groupname) VALUES (?,?,?)",
+                  [email, friend, groupname],
                   (err, result2) => {
                     if (err) {
                       console.log(err);
@@ -167,6 +172,24 @@ app.post("/creategroup", function (req, res) {
           );
         }
         res.send({ message: "inserted users" });
+      }
+    }
+  );
+});
+
+app.get("/invites", function (req, res) {
+  const data = req.query;
+  console.log("Invite by", data.invite_to);
+
+  db.query(
+    "select invite.invite_by,invite.invite_to,invite.groupname, users.name from SplitWise.invite inner join  SplitWise.users on users.email = invite.invite_by where invite_to=?",
+    [data.invite_to],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Result", result);
+        res.send(result);
       }
     }
   );
@@ -361,10 +384,12 @@ app.get("/groupbalances", function (req, res) {
   );
 });
 
-app.post("/settleup", function(req,res){
-  const email= req.body.name;
-  console.log("Borrower ID", email)
-  db.query("delete from SplitWise.transaction where borrowerid= ?", [email],
+app.post("/settleup", function (req, res) {
+  const email = req.body.name;
+  console.log("Borrower ID", email);
+  db.query(
+    "delete from SplitWise.transaction where borrowerid= ?",
+    [email],
     (err, result) => {
       if (err) {
         console.log(err);
@@ -374,42 +399,88 @@ app.post("/settleup", function(req,res){
       }
     }
   );
-})
-
-app.post("/leaveGroup", function(req, res){
-  const name = req.body.name;
-  const groupname = req.body.groupname;
-  db.query("select coalesce((select SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where lenderid = ? and groupid=?), 0)- coalesce((select SUM(amount) as reduce from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where borrowerid = ? and groupid=?), 0) as balance;",
-  [name,groupname,name,groupname],
-  (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Result is", result[0].balance);
-      if(result[0].balance === "0"){
-        console.log("after balance=0");
-        db.query("delete from SplitWise.usersingroup where email= ? and groupname=?", [name, groupname],
-        (err, result) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Is it coming here.");
-            res.send("Exited from group");
-          }
-        }
-      );
-      }
-      else{
-        if(result[0].balance > 0){
-        res.send("Please wait to recieve the remaining amount.");
-      }
-      else if(result[0].balance < 0){
-        res.send("Please clear your dues to leave the group.");
-      }
-    }
-  }
-  })
 });
 
+app.post("/leaveGroup", function (req, res) {
+  const name = req.body.name;
+  const groupname = req.body.groupname;
+  db.query(
+    "select coalesce((select SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where lenderid = ? and groupid=?), 0)- coalesce((select SUM(amount) as reduce from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where borrowerid = ? and groupid=?), 0) as balance;",
+    [name, groupname, name, groupname],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Result is", result[0].balance);
+        if (result[0].balance === "0") {
+          console.log("after balance=0");
+          db.query(
+            "delete from SplitWise.usersingroup where email= ? and groupname=?",
+            [name, groupname],
+            (err, result) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log("Is it coming here.");
+                res.send("Exited from group");
+              }
+            }
+          );
+        } else {
+          if (result[0].balance > 0) {
+            res.send("Please wait to recieve the remaining amount.");
+          } else if (result[0].balance < 0) {
+            res.send("Please clear your dues to leave the group.");
+          }
+        }
+      }
+    }
+  );
+});
 
+app.post("/acceptInvite", function (req, res) {
+  const invite_to = req.body.invite_to;
+  const groupname = req.body.group;
+  console.log("Invite_to", invite_to);
+  console.log("Grp name", groupname);
+  db.query(
+    "delete from SplitWise.invite where invite_to = ? and groupname = ?",
+    [invite_to, groupname],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        db.query(
+          "insert into SplitWise.usersingroup (email,groupname) VALUES(?,?)",
+          [invite_to, groupname],
+          (err, result2) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(result2);
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+app.post("/rejectInvite", function (req, res) {
+  const invite_to = req.body.invite_to;
+  const groupname = req.body.group;
+  console.log("Invite_to", invite_to);
+  console.log("Grp name", groupname);
+  db.query(
+    "delete from SplitWise.invite where invite_to = ? and groupname = ?",
+    [invite_to, groupname],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("invite rejected");
+      }
+    }
+  );
+});
 module.exports = app;
