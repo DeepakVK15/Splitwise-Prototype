@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { Dropdown,Navbar, Nav, Button } from "react-bootstrap";
+import { Dropdown, Navbar, Nav } from "react-bootstrap";
 import head from "./logo.png";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
-import {userLogout}from "../../actions/loginAction" 
-import CenterPage from "../centerpage/CenterPage"
-import { connect } from 'react-redux';
+import { userLogout } from "../../actions/loginAction";
+import CenterPage from "../centerpage/CenterPage";
+import { connect } from "react-redux";
 import "./dashboard.css";
+import axios from "axios";
 
 class dashboard extends Component {
   constructor(props) {
@@ -15,6 +16,8 @@ class dashboard extends Component {
     //maintain the state required for this component
     this.state = {
       redirectVar: null,
+      email: cookie.load("cookie"),
+      user: "",
     };
     this.landingPage = this.landingPage.bind(this);
   }
@@ -24,6 +27,19 @@ class dashboard extends Component {
     cookie.remove("cookie");
     this.props.userLogout();
   };
+
+  componentDidMount() {
+    axios
+      .get("http://localhost:3001/user/", {
+        params: { email: this.state.email },
+      })
+      .then((response) => {
+        //update the state with the response data
+        this.setState({
+          user: response.data,
+        });
+      });
+  }
 
   render() {
     console.log(cookie.load("cookie"));
@@ -44,34 +60,37 @@ class dashboard extends Component {
               className="d-inline-block align-top"
             />
             <div class="split">Splitwise</div>
-            <Dropdown className="dropdown">
-            <Dropdown.Toggle variant="info" id="dropdown-basic">
+            <div className="dropdown">
+            <Dropdown >
+              <Dropdown.Toggle variant="outline-info" id="dropdown-basic">
                 Manage Groups
-            </Dropdown.Toggle>
-          
-            <Dropdown.Menu>
+              </Dropdown.Toggle><Dropdown.Menu>
               <Dropdown.Item href="/creategroup">Create Group</Dropdown.Item>
               <Dropdown.Item href="/mygroups">My Groups</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          &nbsp;
+            <Dropdown>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Hi, {this.state.user}
+              </Dropdown.Toggle>
 
-            <Nav.Item className="ml-auto">
- 
-              <Button variant="info" onClick={this.landingPage}>
-                Logout
-              </Button>
-            </Nav.Item>
+              <Dropdown.Menu>
+                <Dropdown.Item href="/">Logout</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            </div>
+
           </Nav>
         </Navbar>
         <div className="dashboard">
-        <CenterPage page={"Dashboard"} email={cookie.load("cookie")}/> 
+          <CenterPage page={"Dashboard"} email={cookie.load("cookie")} />
         </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = (response) => ({response});
+const mapStateToProps = (response) => ({ response });
 
-
-export default connect(mapStateToProps, {userLogout})(dashboard);
+export default connect(mapStateToProps, { userLogout })(dashboard);

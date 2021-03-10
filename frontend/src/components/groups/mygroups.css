@@ -27,15 +27,18 @@
     margin-left:900px
 }
 .head{
-    margin-left:400px
+    margin-left:400px;
+    display:flex; flex-direction:row;
+    font-size: px;
 }
+
 
 .button{
     margin-left:100px
 }
 
 .mygroups{
-    font-size: x-large;
+    font-size: medium;
     color: grey;
     display:flex; 
     flex-direction:row;
@@ -53,3 +56,9 @@
     height: 2vw;
     display: inline-block;
 }
+
+.groupButtons {
+    margin-left: 50px;
+}
+
+

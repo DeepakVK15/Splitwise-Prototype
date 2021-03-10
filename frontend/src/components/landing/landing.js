@@ -3,6 +3,7 @@ import { Navbar, Nav, Button } from "react-bootstrap";
 import head from "./logo.png";
 import "./landing.css";
 import { Redirect } from "react-router";
+import main from "./homepage.png";
 
 //create the Navbar Component
 class landing extends Component {
@@ -46,6 +47,12 @@ class landing extends Component {
             </Nav.Item>
           </Nav>
         </Navbar>
+        <img
+              alt=""
+              src={main}
+              width="1625"
+              height="700"
+            />
       </div>
     );
   }

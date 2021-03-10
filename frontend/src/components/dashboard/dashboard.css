@@ -1,9 +1,15 @@
 .dashboard{
     display:flex; 
     flex-direction:row;
-     margin-left:300px
+     margin-left:275px
     }
 
 .dropdown{
-    margin-left: 1200px;
+    display:flex; 
+    flex-direction:row;
 }
+
+.split{
+    margin-right:1200px
+}
+

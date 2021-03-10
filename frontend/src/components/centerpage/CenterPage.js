@@ -90,6 +90,7 @@ class CenterPage extends Component {
       };
       oweList.push(obj);
     }
+    let msg = null;
 
     let displayowedDetails = owedList.map((transaction) => {
       return (
@@ -115,14 +116,19 @@ class CenterPage extends Component {
       );
     });
 
+    if(oweList.length === 0 && owedList.length === 0){
+      msg = <h6>No Details to be displayed.</h6>
+    }
+
+
     return (
       <div className="center">
         <h4>{this.props.page}</h4>&nbsp; &nbsp;&nbsp;
-        <Button variant="danger" className="buttons">
+        <Button variant="outline-danger" className="buttons">
           Add an expense
         </Button>
         &nbsp; &nbsp;&nbsp;
-        <Button variant="success" onClick={this.openModal}>
+        <Button variant="outline-success" onClick={this.openModal}>
           Settle up
         </Button>
         <h5>Summary</h5>
@@ -138,6 +144,7 @@ class CenterPage extends Component {
         </ul>
         <h5>Details</h5>
         <div class="details">
+          {msg}
           {displayowedDetails}
           {displayoweDetails}
         </div>

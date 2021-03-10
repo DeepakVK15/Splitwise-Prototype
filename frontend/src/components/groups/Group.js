@@ -5,6 +5,7 @@ import cookie from "react-cookies";
 import "./mygroups.css";
 import { Redirect } from "react-router";
 import Head from "../Heading/Heading";
+import { Dropdown } from "react-bootstrap";
 
 class Group extends Component {
   constructor(props) {
@@ -132,9 +133,24 @@ class Group extends Component {
     console.log("Exit: ", this.state.message);
   };
 
+  updateGroup = () => {
+    this.setState({
+      redirectVar: (
+        <Redirect
+          to={{
+            pathname: "/updategroup",
+            state: { groupname: this.state.name },
+          }}
+        />)
+  })
+}
+
   render() {
     let errMsg = null;
     console.log("message ", this.state.message);
+    if(!cookie.load("cookie")){
+      this.setState({redirectVar: <Redirect to="/" />})
+    }
     if (this.state.message === "Exited from group") {
       this.setState({ redirectVar: <Redirect to="/dashboard" /> });
     }
@@ -195,7 +211,16 @@ class Group extends Component {
         <Head />
         {errMsg}
         <div className="head">
-          <h4>{this.state.name}</h4>
+            <Dropdown>
+                  <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" size="lg">
+                  {this.state.name}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={this.updateGroup} group={this.state.name}>Update Group</Dropdown.Item>
+                    <Dropdown.Item onClick={this.leaveGroup}>Leave Group</Dropdown.Item>
+                    </Dropdown.Menu>
+                
+                </Dropdown>
           <br />
         </div>
         <Modal show={this.state.isOpen} onHide={this.close}>
@@ -256,20 +281,18 @@ class Group extends Component {
         <div class="group">
           <div className="expenses">
             <h5>Expenses: </h5>
+            
             <br />
             <br />
             {expenses}
             <br /> <br />
             <br />
-            <Button variant="danger" onClick={this.openModal}>
+            <Button variant="outline-danger" onClick={this.openModal}>
               Add an expense
             </Button>{" "}
-            <Button variant="success" onClick={this.settleUp}>
+            <Button variant="outline-success" onClick={this.settleUp}>
               Settle up
             </Button>{" "}
-            <Button variant="dark" onClick={this.leaveGroup}>
-              Leave Group{" "}
-            </Button>
           </div>
           <div className="groupBalance">
             <label>Group Balance</label>

@@ -129,6 +129,21 @@ app.post("/login", function (req, res) {
   });
 });
 
+app.get("/user", function(req,res){
+  const data = req.query;
+  console.log("Email is", data.email);
+  db.query("SELECT * from users where email= ?", [data.email], (err, result) => {
+    if (err) {
+      console.log(err)
+    }
+    else{
+      console.log("Name: ", result[0].name);
+      res.send(result[0].name);
+    }
+
+})
+})
+
 app.post("/creategroup", function (req, res) {
   const groupname = req.body.groupname;
   const friends = req.body.friends;

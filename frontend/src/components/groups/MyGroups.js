@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
 import Head from "../Heading/Heading";
+import GroupContainer from "./GroupContainer";
 
 class MyGroups extends Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class MyGroups extends Component {
       email: cookie.load("cookie"),
       redirect: null,
       invites: [],
+      searchGroup: "",
     };
     this.loadGroupPage = this.loadGroupPage.bind(this);
   }
@@ -86,19 +88,17 @@ class MyGroups extends Component {
     window.location.reload(true);
   };
 
-  render() {
-    const groups = this.state.groups.map((group) => (
-      <ul>
-        <Button
-          variant="light"
-          onClick={() => this.loadGroupPage(group)}
-          className="groupButtons"
-        >
-          {group}
-        </Button>
-      </ul>
-    ));
+  editSearchTerm = (e) => {
+    this.setState({ searchGroup: e.target.value });
+  };
 
+  dynamicSearch = () => {
+    return this.state.groups.filter((group) =>
+      group.toLowerCase().includes(this.state.searchGroup.toLowerCase())
+    );
+  };
+
+  render() {
     const invites = this.state.invites.map((invite) => (
       <div>
         <label>
@@ -128,7 +128,7 @@ class MyGroups extends Component {
       <div>
         {this.state.redirect}
         <Head />
-        <div class="mygroups">
+        <div className="mygroups">
           <div>
             <br />
             <label>My Groups </label> &nbsp; &nbsp;
@@ -141,7 +141,19 @@ class MyGroups extends Component {
             </Button>
             <br />
             <br />
-            {groups}
+            <div>
+              <input
+                placeholder={"search group"}
+                value={this.state.searchGroup}
+                onChange={this.editSearchTerm}
+                style={{ width: "275px" }}
+              />
+              <br />
+              <br />
+            </div>
+            <div>
+              <GroupContainer groups={this.dynamicSearch()} />
+            </div>
           </div>
           <div className="invites">
             <label>Invites </label> &nbsp; &nbsp;
