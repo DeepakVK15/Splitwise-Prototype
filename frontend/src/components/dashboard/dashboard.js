@@ -29,6 +29,8 @@ class dashboard extends Component {
   };
 
   componentDidMount() {
+    console.log("here ",this.state.email);
+    if(this.state.email){
     axios
       .get("http://localhost:3001/user/", {
         params: { email: this.state.email },
@@ -39,6 +41,7 @@ class dashboard extends Component {
           user: response.data,
         });
       });
+    }
   }
 
   render() {
@@ -76,7 +79,8 @@ class dashboard extends Component {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item href="/">Logout</Dropdown.Item>
+                <Dropdown.Item onClick={this.landingPage}>Logout</Dropdown.Item>
+                <Dropdown.Item href="/activity">Activity</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             </div>
