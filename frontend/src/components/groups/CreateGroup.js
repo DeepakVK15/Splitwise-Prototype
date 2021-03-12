@@ -1,12 +1,11 @@
-import React, { Component } from "react";
+import React, { Component} from "react";
 import head from "../login/logo.png";
 import { Button } from "react-bootstrap";
 import "./creategroups.css";
 import axios from "axios";
 import { Redirect } from "react-router";
 import cookie  from "react-cookies";
-import Head from "../Heading/Heading"
-
+import Head from "../Heading/Heading";
 
 class CreateGroup extends Component {
   constructor(props) {

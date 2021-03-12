@@ -7,7 +7,7 @@ import dashboard from "./components/dashboard/dashboard";
 import CreateGroup from "./components/groups/CreateGroup";
 import MyGroups from "./components/groups/MyGroups";
 import Group from "./components/groups/Group";
-import UpdateGroup from "./components/groups/UpdateGroup";
+import RecentActivities from "./components/recentactivities/RecentActivities";
 
 class Main extends Component {
   render() {
@@ -20,7 +20,7 @@ class Main extends Component {
         <Route exact path="/creategroup" component={CreateGroup} />
         <Route exact path="/mygroups" component={MyGroups} />
         <Route exact path="/group" component={Group} />
-        <Route exact path="/updategroup" component={UpdateGroup} />
+        <Route exact path="/activity" component={RecentActivities} />
       </div>
     );
   }

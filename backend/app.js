@@ -129,20 +129,21 @@ app.post("/login", function (req, res) {
   });
 });
 
-app.get("/user", function(req,res){
+app.get("/user", function (req, res) {
   const data = req.query;
   console.log("Email is", data.email);
-  db.query("SELECT * from users where email= ?", [data.email], (err, result) => {
-    if (err) {
-      console.log(err)
+  db.query(
+    "SELECT * from users where email= ?",
+    [data.email],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result[0].name);
+      }
     }
-    else{
-      console.log("Name: ", result[0].name);
-      res.send(result[0].name);
-    }
-
-})
-})
+  );
+});
 
 app.post("/creategroup", function (req, res) {
   const groupname = req.body.groupname;
@@ -159,6 +160,11 @@ app.post("/creategroup", function (req, res) {
       if (result.length > 0) {
         res.send({ message: "Group with the same name already exists." });
       } else {
+        db.query(
+          "insert into SplitWise.activity(user,operation,groupname,amount,date,description) VALUES(?,?,?,?,now(), ?)",
+          [email, "created", groupname, null, null]
+        );
+
         db.query(
           "insert into SplitWise.usersingroup(email,groupname) VALUES (?,?)",
           [email, groupname]
@@ -225,7 +231,7 @@ app.get("/mygroups", function (req, res) {
         for (var i = 0; i < result.length; i++) {
           result2.push(result[i].groupname);
         }
-        // console.log(result2);
+        console.log(result2);
 
         res.send(result2);
       }
@@ -317,6 +323,10 @@ app.post("/group", function (req, res) {
         console.log(err);
       } else {
         console.log("Result:", result);
+        db.query(
+          "insert into SplitWise.activity(user,operation,groupname,amount,date, description) VALUES(?,?,?,?,now(), ?)",
+          [paid_by, "added", group_name, amount, desc]
+        );
         res.send(result);
       }
     }
@@ -401,14 +411,19 @@ app.get("/groupbalances", function (req, res) {
 
 app.post("/settleup", function (req, res) {
   const email = req.body.name;
+  const groupname = req.body.groupname;
   console.log("Borrower ID", email);
   db.query(
-    "delete from SplitWise.transaction where borrowerid= ?",
-    [email],
+    "delete from SplitWise.transaction where borrowerid= ? and groupid=?",
+    [email, groupname],
     (err, result) => {
       if (err) {
         console.log(err);
       } else {
+        db.query(
+          "insert into SplitWise.activity(user,operation,groupname,amount,date,description) VALUES(?,?,?,?,now(), ?)",
+          [email, "updated", groupname, null, null]
+        );
         console.log("Result ", result);
         console.log("deleted successfully");
       }
@@ -498,4 +513,55 @@ app.post("/rejectInvite", function (req, res) {
     }
   );
 });
+
+app.get("/activities", function (req, res) {
+  const user = req.query.email;
+  let resultList = [];
+
+  db.query(
+    "select * from usersingroup where email=?",
+    [user],
+    (err, result1) => {
+      if (err) {
+        console.log(err);
+      } else {
+        for (let i = 0; i < result1.length; i++) {
+          db.query(
+            "select activity.*, users.name from SplitWise.activity inner join SplitWise.users on activity.user = users.email where groupname = ?",
+            [result1[i].groupname],
+            (err, result2) => {
+              if (err) {
+                console.log(err);
+              } else {
+                resultList = resultList.concat(result2);
+                if (i === result1.length - 1) {
+                  res.send(resultList);
+                }
+              }
+            }
+          );
+        }
+      }
+    }
+  );
+});
+
+app.post("/addUserToGroup",function(req,res){
+
+const email = req.body.email;
+const groupname = req.body.groupname;
+const invitedby = req.body.invitedby
+
+db.query(
+  "insert into invite (invite_by, invite_to, groupname) VALUES (?,?,?)",
+  [invitedby, email, groupname],
+  (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    else{
+      console.log("invite inserted", result);
+    }
+})
+})
 module.exports = app;
