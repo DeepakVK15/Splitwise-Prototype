@@ -32,7 +32,7 @@ class dashboard extends Component {
     console.log("here ",this.state.email);
     if(this.state.email){
     axios
-      .get("http://localhost:3001/user/", {
+      .get("http://localhost:3001/login/user/", {
         params: { email: this.state.email },
       })
       .then((response) => {

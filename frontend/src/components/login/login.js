@@ -4,12 +4,11 @@ import { Navbar, Nav, Button } from "react-bootstrap";
 import "./login.css";
 import { userLogin } from "../../actions/loginAction";
 import { connect } from "react-redux";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
 
 class login extends Component {
-  
   constructor(props) {
     super(props);
 
@@ -133,12 +132,12 @@ class login extends Component {
 
 login.propTypes = {
   userLogin: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
-}
+  user: PropTypes.object.isRequired,
+};
 
 const mapStateToProps = (state) => {
   return {
-    user: state.login.user
+    user: state.login.user,
   };
 };
 

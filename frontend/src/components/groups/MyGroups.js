@@ -22,7 +22,7 @@ class MyGroups extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/mygroups/", {
+      .get("http://localhost:3001/mygroups/mygroups/", {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -32,7 +32,7 @@ class MyGroups extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/invites", {
+      .get("http://localhost:3001/mygroups/invites", {
         params: { invite_to: this.state.email },
       })
       .then((response) => {
@@ -75,7 +75,7 @@ class MyGroups extends Component {
       invite_to: username,
       group: groupname,
     };
-    axios.post("http://localhost:3001/acceptInvite", data);
+    axios.post("http://localhost:3001/mygroups/acceptInvite", data);
     window.location.reload(true);
   };
 
@@ -84,7 +84,7 @@ class MyGroups extends Component {
       invite_to: username,
       group: groupname,
     };
-    axios.post("http://localhost:3001/rejectInvite", data);
+    axios.post("http://localhost:3001/mygroups/rejectInvite", data);
     window.location.reload(true);
   };
 

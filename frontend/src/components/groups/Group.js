@@ -22,9 +22,9 @@ class Group extends Component {
       redirectVar: null,
       groupBalance: [],
       message: "",
-      updateOpen:false,
-      username:"",
-      email:""
+      updateOpen: false,
+      username: "",
+      email: "",
     };
     this.descriptionHandler = this.descriptionHandler.bind(this);
     this.amountHandler = this.amountHandler.bind(this);
@@ -44,9 +44,9 @@ class Group extends Component {
   };
   emailHandler = (e) => {
     this.setState({
-      email:e.target.value
-    })
-  }
+      email: e.target.value,
+    });
+  };
 
   amountHandler = (e) => {
     this.setState({
@@ -67,7 +67,7 @@ class Group extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/group/", {
+      .get("http://localhost:3001/group/group", {
         params: { name: this.state.name },
       })
       .then((response) => {
@@ -78,7 +78,7 @@ class Group extends Component {
         console.log("Expenses in group", this.state.expenses);
       });
     axios
-      .get("http://localhost:3001/members", {
+      .get("http://localhost:3001/group/members", {
         params: { name: this.state.name },
       })
       .then((response) => {
@@ -87,7 +87,7 @@ class Group extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/groupbalances", {
+      .get("http://localhost:3001/group/groupbalances", {
         params: { groupname: this.state.name },
       })
       .then((response) => {
@@ -98,7 +98,7 @@ class Group extends Component {
   }
 
   openModal = () => this.setState({ isOpen: true });
-  updateOpen = () => this.setState({updateOpen: true});
+  updateOpen = () => this.setState({ updateOpen: true });
   closeModal = () => {
     console.log("Paid by in group", this.state.paidmember);
     const data = {
@@ -109,7 +109,7 @@ class Group extends Component {
       date: this.state.date,
     };
     console.log("Amount is", data.amount);
-    axios.post("http://localhost:3001/group", data);
+    axios.post("http://localhost:3001/group/group", data);
 
     this.setState({ isOpen: false });
     window.location.reload(true);
@@ -117,11 +117,11 @@ class Group extends Component {
   addUser = () => {
     const data = {
       groupname: this.state.name,
-      email:this.state.email,
-      invitedby:cookie.load("cookie")
+      email: this.state.email,
+      invitedby: cookie.load("cookie"),
     };
     console.log("Amount is", data.amount);
-    axios.post("http://localhost:3001/addUserToGroup", data);
+    axios.post("http://localhost:3001/group/addUserToGroup", data);
 
     this.setState({ isOpen: false });
     window.location.reload(true);
@@ -131,7 +131,7 @@ class Group extends Component {
     this.setState({ isOpen: false });
   };
   updateClose = () => {
-    this.setState({updateOpen: false });
+    this.setState({ updateOpen: false });
   };
   landingPage = () => {
     this.setState({ redirectVar: <Redirect to="/" /> });
@@ -145,9 +145,9 @@ class Group extends Component {
   settleUp = () => {
     const data = {
       name: cookie.load("cookie"),
-      groupname:this.state.name
+      groupname: this.state.name,
     };
-    axios.post("http://localhost:3001/settleup", data);
+    axios.post("http://localhost:3001/transactions/settleup", data);
     window.location.reload(true);
   };
 
@@ -157,11 +157,13 @@ class Group extends Component {
       name: cookie.load("cookie"),
       groupname: this.state.name,
     };
-    axios.post("http://localhost:3001/leaveGroup", data).then((response) => {
-      this.setState({
-        message: response.data,
+    axios
+      .post("http://localhost:3001/group/leaveGroup", data)
+      .then((response) => {
+        this.setState({
+          message: response.data,
+        });
       });
-    });
     console.log("Exit: ", this.state.message);
   };
 
@@ -173,18 +175,19 @@ class Group extends Component {
             pathname: "/updategroup",
             state: { groupname: this.state.name },
           }}
-        />)
-  })
-}
+        />
+      ),
+    });
+  };
 
   render() {
     let errMsg = null;
     console.log("message ", this.state.message);
-    if(!cookie.load("cookie")){
-      this.setState({redirectVar: <Redirect to="/" />})
+    if (!cookie.load("cookie")) {
+      this.setState({ redirectVar: <Redirect to="/" /> });
     }
     if (this.state.message === "Exited from group") {
-      this.setState({ redirectVar: <Redirect to="/dashboard" /> });
+      this.setState({ redirectVar: <Redirect to="/mygroups" /> });
     }
     if (this.state.message === "Please wait to recieve the remaining amount.") {
       errMsg = (
@@ -243,15 +246,23 @@ class Group extends Component {
         <Head />
         {errMsg}
         <div className="head">
-            <Dropdown>
-                  <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" size="lg">
-                  {this.state.name}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={this.updateOpen}>Add a user</Dropdown.Item>
-                    <Dropdown.Item onClick={this.leaveGroup}>Leave Group</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="outline-secondary"
+              id="dropdown-basic"
+              size="lg"
+            >
+              {this.state.name}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={this.updateOpen}>
+                Add a user
+              </Dropdown.Item>
+              <Dropdown.Item onClick={this.leaveGroup}>
+                Leave Group
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
           <br />
         </div>
         <Modal show={this.state.isOpen} onHide={this.close}>
@@ -310,40 +321,39 @@ class Group extends Component {
           </Modal.Footer>
         </Modal>
         <Modal show={this.state.updateOpen} onHide={this.updateClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add user</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <input
-              type="text"
-              id="username"
-              onChange={this.nameChange}
-              placeholder="Name"
-              required
-            />
-            <br />
-            <br />
-            <input
-              type="email"
-              id="email"
-              onChange={this.emailHandler}
-              placeholder="Email"
-              required
-            />
-            <br />
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={this.addUser}>
-            Add
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Modal.Header closeButton>
+            <Modal.Title>Add user</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form>
+              <input
+                type="text"
+                id="username"
+                onChange={this.nameChange}
+                placeholder="Name"
+                required
+              />
+              <br />
+              <br />
+              <input
+                type="email"
+                id="email"
+                onChange={this.emailHandler}
+                placeholder="Email"
+                required
+              />
+              <br />
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" onClick={this.addUser}>
+              Add
+            </Button>
+          </Modal.Footer>
+        </Modal>
         <div class="group">
           <div className="expenses">
             <h5>Expenses: </h5>
-            
             <br />
             <br />
             {expenses}

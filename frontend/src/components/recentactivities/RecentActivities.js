@@ -14,7 +14,7 @@ class RecentActivities extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/activities/", {
+      .get("http://localhost:3001/activities/myactivities", {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {
@@ -25,7 +25,7 @@ class RecentActivities extends Component {
       });
 
     axios
-      .get("http://localhost:3001/mygroups/", {
+      .get("http://localhost:3001/mygroups/mygroups", {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {
@@ -51,9 +51,13 @@ class RecentActivities extends Component {
 
   render() {
     let activities = [];
-    if(this.state.activities.length === 0){
-      
-      activities.push(<div><br/>No recent activity to show.</div>);
+    if (this.state.activities.length === 0) {
+      activities.push(
+        <div>
+          <br />
+          No recent activity to show.
+        </div>
+      );
     }
 
     if (this.state.order === "desc") {

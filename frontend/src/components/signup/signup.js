@@ -51,7 +51,6 @@ class signup extends Component {
       email: this.state.email,
       password: this.state.password,
     };
-    console.log("Lets see the password,", data.password);
 
     if (!validator.isEmail(data.email)) {
       this.setState({ message: "Enter a valid email address." });
@@ -75,13 +74,20 @@ class signup extends Component {
       redirectVar = <Redirect to="/dashboard" />;
     } else if (
       this.state.message === "Enter a valid email address." ||
-      this.state.message === "Account with email id already exists." ||
       this.state.message === "Enter a name." ||
       this.state.message === "Password length must be 8 or more."
     ) {
       errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.message}
+        </div>
+      );
+    } else if (
+      this.props.user.message === "Account with email id already exists."
+    ) {
+      errMsg = (
+        <div class="alert alert-danger" role="alert">
+          {this.props.user.message}
         </div>
       );
     }

@@ -1,10 +1,10 @@
-import React, { Component} from "react";
+import React, { Component } from "react";
 import head from "../login/logo.png";
 import { Button } from "react-bootstrap";
 import "./creategroups.css";
 import axios from "axios";
 import { Redirect } from "react-router";
-import cookie  from "react-cookies";
+import cookie from "react-cookies";
 import Head from "../Heading/Heading";
 
 class CreateGroup extends Component {
@@ -22,8 +22,6 @@ class CreateGroup extends Component {
     this.imageHandler = this.imageHandler.bind(this);
     this.createGroup = this.createGroup.bind(this);
     this.landingPage = this.landingPage.bind(this);
-
-   
   }
 
   groupnameHandler = (e) => {
@@ -58,7 +56,7 @@ class CreateGroup extends Component {
   dashBoard = () => {
     this.setState({ redirectVar: <Redirect to="/dashboard" /> });
   };
-  
+
   createUI() {
     return this.state.friends.map((el, i) => (
       <div>
@@ -89,36 +87,38 @@ class CreateGroup extends Component {
   }
 
   createGroup() {
-     if(this.state.groupname===""){
-      this.setState({errCode:"Group should have a name."});
+    if (this.state.groupname === "") {
+      this.setState({ errCode: "Group should have a name." });
+    } else if (this.state.friends.length < 2) {
+      this.setState({ errCode: "Group should have two or more members." });
+    } else {
+      const data = {
+        groupname: this.state.groupname,
+        friends: this.state.friends,
+        image: this.state.image,
+        email: cookie.load("cookie"),
+      };
+
+      axios.defaults.withCredentials = true;
+      axios
+        .post("http://localhost:3001/group/creategroup", data)
+        .then((response) => {
+          // eslint-disable-next-line react/no-direct-mutation-state
+          // this.setState({errCode :response.status})
+          if (response.data.message) {
+            this.setState({ errCode: response.data.message });
+          }
+        });
     }
-    else if(this.state.friends.length < 2){
-      this.setState({errCode: "Group should have two or more members."})
-    }
-    
-    else{
-    const data = {
-      groupname: this.state.groupname,
-      friends: this.state.friends,
-      image: this.state.image,
-      email: cookie.load("cookie")
-    };
-  
-    axios.defaults.withCredentials = true;
-    axios.post("http://localhost:3001/creategroup", data).then((response) => {
-      // eslint-disable-next-line react/no-direct-mutation-state
-      // this.setState({errCode :response.status})
-      if (response.data.message) {
-        this.setState({ errCode: response.data.message });
-      }
-    });
-  }
   }
 
   render() {
     let errMsg = null;
-    if (this.state.errCode === "Group with the same name already exists." || 
-    this.state.errCode === "Group should have two or more members." || this.state.errCode === "Group should have a name.") {
+    if (
+      this.state.errCode === "Group with the same name already exists." ||
+      this.state.errCode === "Group should have two or more members." ||
+      this.state.errCode === "Group should have a name."
+    ) {
       errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.errCode}

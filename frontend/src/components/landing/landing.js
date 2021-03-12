@@ -47,12 +47,7 @@ class landing extends Component {
             </Nav.Item>
           </Nav>
         </Navbar>
-        <img
-              alt=""
-              src={main}
-              width="1625"
-              height="700"
-            />
+        <img alt="" src={main} width="1625" height="700" />
       </div>
     );
   }

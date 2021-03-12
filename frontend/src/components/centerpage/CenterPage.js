@@ -31,7 +31,7 @@ class CenterPage extends Component {
       modalEmail: this.state.modalEmail,
     };
     console.log("Centerpage ", data.modalEmail);
-    axios.post("http://localhost:3001/modal", data);
+    axios.post("http://localhost:3001/transactions/modal", data);
     this.setState({ isOpen: false });
     window.location.reload(true);
   };
@@ -42,7 +42,7 @@ class CenterPage extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/lender/", {
+      .get("http://localhost:3001/transactions/lender/", {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -52,7 +52,7 @@ class CenterPage extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/borrower/", {
+      .get("http://localhost:3001/transactions/borrower/", {
         params: { email: this.state.email },
       })
       .then((response) => {
