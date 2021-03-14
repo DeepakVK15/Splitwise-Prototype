@@ -122,7 +122,6 @@ class MyGroups extends Component {
         </Button>
       </div>
     ));
-    console.log("redirecting", this.state.redirectVar);
 
     return (
       <div>

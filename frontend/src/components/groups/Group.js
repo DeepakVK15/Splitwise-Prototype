@@ -25,6 +25,7 @@ class Group extends Component {
       updateOpen: false,
       username: "",
       email: "",
+      currency:""
     };
     this.descriptionHandler = this.descriptionHandler.bind(this);
     this.amountHandler = this.amountHandler.bind(this);
@@ -75,7 +76,6 @@ class Group extends Component {
         this.setState({
           expenses: this.state.expenses.concat(response.data),
         });
-        console.log("Expenses in group", this.state.expenses);
       });
     axios
       .get("http://localhost:3001/group/members", {
@@ -95,6 +95,12 @@ class Group extends Component {
           groupBalance: this.state.groupBalance.concat(response.data),
         });
       });
+      axios.get("http://localhost:3001/profile/myprofile",{
+        params: { email: cookie.load("cookie") }
+    }).then((response) => {
+
+      this.setState({currency:response.data[0].currency})
+    });
   }
 
   openModal = () => this.setState({ isOpen: true });
@@ -107,6 +113,7 @@ class Group extends Component {
       groupname: this.state.name,
       amount: this.state.amount,
       date: this.state.date,
+      email: cookie.load("cookie")
     };
     console.log("Amount is", data.amount);
     axios.post("http://localhost:3001/group/group", data);
@@ -208,7 +215,7 @@ class Group extends Component {
     let expenses = this.state.expenses.map((expense) => (
       <h6>
         {expense.date.split("T")[0]} &nbsp; {expense.description} &nbsp;{" "}
-        {expense.name} &nbsp;${expense.amount}
+        {expense.name} &nbsp;{this.state.currency}{expense.amount}
       </h6>
     ));
 
@@ -225,7 +232,7 @@ class Group extends Component {
         if (this.state.groupBalance[i].balance > 0) {
           balance.push(
             <h6>
-              {this.state.groupBalance[i].name} gets back $
+              {this.state.groupBalance[i].name} gets back {this.state.currency}
               {this.state.groupBalance[i].balance}
             </h6>
           );
@@ -233,11 +240,19 @@ class Group extends Component {
           let temp = Math.abs(this.state.groupBalance[i].balance);
           balance.push(
             <h6>
-              {this.state.groupBalance[i].name} owes ${temp}
+              {this.state.groupBalance[i].name} owes {this.state.currency}{temp}
             </h6>
           );
         }
       }
+    }
+    if(balance.length===0){
+      balance.push(
+      <h6>
+        No pending payments in this group.
+      </h6>
+
+      )
     }
 
     return (
@@ -282,7 +297,7 @@ class Group extends Component {
               />
               <br />
               <br />
-              <label>$</label>
+              <label>{this.state.currency}</label>
               <input
                 type="text"
                 id="amount"

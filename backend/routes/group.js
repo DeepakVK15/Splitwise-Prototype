@@ -8,7 +8,7 @@ router.post("/creategroup", function (req, res) {
   const image = req.body.image;
   const email = req.body.email;
   db.query(
-    "select * from usersingroup where groupname = ?",
+    "select * from groups where groupname = ?",
     [groupname],
     (err, result) => {
       if (err) {
@@ -17,15 +17,21 @@ router.post("/creategroup", function (req, res) {
       if (result.length > 0) {
         res.send({ message: "Group with the same name already exists." });
       } else {
-        db.query(
-          "insert into SplitWise.activity(user,operation,groupname,amount,date,description) VALUES(?,?,?,?,now(), ?)",
-          [email, "created", groupname, null, null]
-        );
+        db.query("insert into SplitWise.groups(groupname,image) VALUES (?,?)", [
+          groupname,
+          null,
+        ]);
 
         db.query(
           "insert into SplitWise.usersingroup(email,groupname) VALUES (?,?)",
           [email, groupname]
         );
+
+        db.query(
+          "insert into SplitWise.activity(user,operation,groupname,amount,date,description) VALUES(?,?,?,?,now(), ?)",
+          [email, "created", groupname, null, null]
+        );
+
         for (var i = 0; i < friends.length; i++) {
           let friend = friends[i].email;
           db.query(
@@ -79,6 +85,7 @@ router.post("/group", function (req, res) {
   const group_name = req.body.groupname;
   const amount = req.body.amount;
   const date = req.body.date;
+  const email = req.body.email;
 
   console.log("Paid_By:", paid_by);
   db.query(
@@ -91,7 +98,7 @@ router.post("/group", function (req, res) {
         console.log("Result:", result);
         db.query(
           "insert into SplitWise.activity(user,operation,groupname,amount,date, description) VALUES(?,?,?,?,now(), ?)",
-          [paid_by, "added", group_name, amount, desc]
+          [email, "added", group_name, amount, desc]
         );
         res.send(result);
       }

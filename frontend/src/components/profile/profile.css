@@ -1,0 +1,20 @@
+.profile{
+    display:flex; 
+    flex-direction:row;
+    margin-left: 400px;
+}
+
+.profile2{
+   margin-top:85px;
+   margin-left:150px
+}
+
+.save{
+
+    font-size: 20px;
+      color:white;
+      background-color:orangered ;
+      margin-left: 650px;
+      margin-top:75px
+
+}

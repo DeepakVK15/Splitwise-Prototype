@@ -81,6 +81,7 @@ class dashboard extends Component {
               <Dropdown.Menu>
                 <Dropdown.Item onClick={this.landingPage}>Logout</Dropdown.Item>
                 <Dropdown.Item href="/activity">Activity</Dropdown.Item>
+                <Dropdown.Item href="/profile">Profile</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             </div>

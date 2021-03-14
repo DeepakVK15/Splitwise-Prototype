@@ -14,8 +14,8 @@ router.post("/", function (req, res) {
       }
       if (result.length === 0) {
         db.query(
-          "insert into users (name, email, password) VALUES (?,?,?)",
-          [name, email, password],
+          "insert into users (name, email, password, phone, currency, timezone, language) VALUES (?,?,?,?,?,?,?)",
+          [name, email, password, "", "$", "(GMT-08:00) Pacific Time (US & Canada)", "English"],
           (err, result2) => {
             if (err) {
               console.log(err);

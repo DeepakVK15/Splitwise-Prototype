@@ -13,6 +13,7 @@ class CenterPage extends Component {
       oweTransactions: [],
       isOpen: false,
       modalEmail: "",
+      currency: "",
     };
     this.modalEmailHandler = this.modalEmailHandler.bind(this);
 
@@ -61,6 +62,13 @@ class CenterPage extends Component {
           oweTransactions: this.state.oweTransactions.concat(response.data),
         });
       });
+    axios
+      .get("http://localhost:3001/profile/myprofile", {
+        params: { email: this.state.email },
+      })
+      .then((response) => {
+        this.setState({ currency: response.data[0].currency });
+      });
   }
 
   render() {
@@ -96,8 +104,8 @@ class CenterPage extends Component {
       return (
         <div>
           <label>
-            {transaction.name} owes you ${transaction.amount} for "
-            {transaction.group}"
+            {transaction.name} owes you {this.state.currency}
+            {transaction.amount} for "{transaction.group}"
           </label>
           <br />
         </div>
@@ -108,18 +116,17 @@ class CenterPage extends Component {
       return (
         <div class="oweDetails">
           <label>
-            You owe ${transaction.amount} to {transaction.name} for "
-            {transaction.group}"
+            You owe {this.state.currency}
+            {transaction.amount} to {transaction.name} for "{transaction.group}"
           </label>
           <br />
         </div>
       );
     });
 
-    if(oweList.length === 0 && owedList.length === 0){
-      msg = <h6>No Details to be displayed.</h6>
+    if (oweList.length === 0 && owedList.length === 0) {
+      msg = <h6>No Details to be displayed.</h6>;
     }
-
 
     return (
       <div className="center">
@@ -133,14 +140,23 @@ class CenterPage extends Component {
         </Button>
         <h5>Summary</h5>
         <ul>
-          <label>Total balance: ${total_amount}</label>
+          <label>
+            Total balance: {this.state.currency}
+            {total_amount}
+          </label>
         </ul>
         <ul>
-          <label>You owe: ${you_owe}</label>
+          <label>
+            You owe: {this.state.currency}
+            {you_owe}
+          </label>
         </ul>
         <ul>
           {" "}
-          <label>You are owed: ${owed}</label>
+          <label>
+            You are owed: {this.state.currency}
+            {owed}
+          </label>
         </ul>
         <h5>Details</h5>
         <div class="details">

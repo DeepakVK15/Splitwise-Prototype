@@ -8,6 +8,7 @@ import CreateGroup from "./components/groups/CreateGroup";
 import MyGroups from "./components/groups/MyGroups";
 import Group from "./components/groups/Group";
 import RecentActivities from "./components/recentactivities/RecentActivities";
+import Profile from "./components/profile/profile";
 
 class Main extends Component {
   render() {
@@ -21,6 +22,7 @@ class Main extends Component {
         <Route exact path="/mygroups" component={MyGroups} />
         <Route exact path="/group" component={Group} />
         <Route exact path="/activity" component={RecentActivities} />
+        <Route exact path="/profile" component={Profile} />
       </div>
     );
   }
