@@ -29,23 +29,22 @@ class dashboard extends Component {
   };
 
   componentDidMount() {
-    console.log("here ",this.state.email);
-    if(this.state.email){
-    axios
-      .get("http://localhost:3001/login/user/", {
-        params: { email: this.state.email },
-      })
-      .then((response) => {
-        //update the state with the response data
-        this.setState({
-          user: response.data,
+    console.log("here ", this.state.email);
+    if (this.state.email) {
+      axios
+        .get("http://localhost:3001/login/user/", {
+          params: { email: this.state.email },
+        })
+        .then((response) => {
+          //update the state with the response data
+          this.setState({
+            user: response.data,
+          });
         });
-      });
     }
   }
 
   render() {
-    console.log(cookie.load("cookie"));
     if (!cookie.load("cookie")) {
       this.setState({ redirectVar: <Redirect to="/" /> });
     }
@@ -64,28 +63,32 @@ class dashboard extends Component {
             />
             <div class="split">Splitwise</div>
             <div className="dropdown">
-            <Dropdown >
-              <Dropdown.Toggle variant="outline-info" id="dropdown-basic">
-                Manage Groups
-              </Dropdown.Toggle><Dropdown.Menu>
-              <Dropdown.Item href="/creategroup">Create Group</Dropdown.Item>
-              <Dropdown.Item href="/mygroups">My Groups</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          &nbsp;
-            <Dropdown>
-              <Dropdown.Toggle variant="success" id="dropdown-basic">
-                Hi, {this.state.user}
-              </Dropdown.Toggle>
+              <Dropdown>
+                <Dropdown.Toggle variant="outline-info" id="dropdown-basic">
+                  Manage Groups
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item href="/creategroup">
+                    Create Group
+                  </Dropdown.Item>
+                  <Dropdown.Item href="/mygroups">My Groups</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              &nbsp;
+              <Dropdown>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  Hi, {this.state.user}
+                </Dropdown.Toggle>
 
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={this.landingPage}>Logout</Dropdown.Item>
-                <Dropdown.Item href="/activity">Activity</Dropdown.Item>
-                <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={this.landingPage}>
+                    Logout
+                  </Dropdown.Item>
+                  <Dropdown.Item href="/activity">Activity</Dropdown.Item>
+                  <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
-
           </Nav>
         </Navbar>
         <div className="dashboard">

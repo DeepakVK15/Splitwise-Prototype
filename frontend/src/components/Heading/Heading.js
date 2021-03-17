@@ -35,7 +35,7 @@ class Heading extends Component {
               height="40"
               className="d-inline-block align-top"
             />
-            <div class="split">Splitwise</div>
+            <div className="split">Splitwise</div>
             <Nav.Item className="ml-auto">
               <Button variant="light" onClick={this.dashBoard}>
                 Dashboard

@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import cookie from "react-cookies";
 import "./activities.css";
 import Head from "../Heading/Heading";
+import { Redirect } from "react-router-dom";
 
 class RecentActivities extends Component {
   state = {
@@ -10,10 +11,11 @@ class RecentActivities extends Component {
     groups: [],
     group: "",
     order: "",
+    redirectVar: "",
   };
 
-  componentDidMount() {
-    axios
+  async componentDidMount() {
+    await axios
       .get("http://localhost:3001/activities/myactivities", {
         params: { email: cookie.load("cookie") },
       })
@@ -24,7 +26,7 @@ class RecentActivities extends Component {
         });
       });
 
-    axios
+    await axios
       .get("http://localhost:3001/mygroups/mygroups", {
         params: { email: cookie.load("cookie") },
       })
@@ -34,7 +36,6 @@ class RecentActivities extends Component {
           groups: this.state.groups.concat(response.data),
         });
       });
-    console.log("Group list", this.state.groups);
   }
 
   handleChange = (e) => {
@@ -50,6 +51,9 @@ class RecentActivities extends Component {
   };
 
   render() {
+    if (!cookie.load("cookie")) {
+      this.setState({ redirectVar: <Redirect to="/" /> });
+    }
     let activities = [];
     if (this.state.activities.length === 0) {
       activities.push(
@@ -61,14 +65,12 @@ class RecentActivities extends Component {
     }
 
     if (this.state.order === "desc") {
-      console.log("desc");
       this.state.activities.sort(function (a, b) {
         if (a.date > b.date) return 1;
         if (a.date < b.date) return -1;
         return 0;
       });
     } else if (this.state.order === "asc") {
-      console.log("DESC");
       this.state.activities.sort(function (a, b) {
         if (a.date > b.date) return -1;
         if (a.date < b.date) return 1;
@@ -80,8 +82,6 @@ class RecentActivities extends Component {
       if (this.state.activities[i].user === cookie.load("cookie")) {
         this.state.activities[i].name = "You";
       }
-
-      console.log("Value of group", this.state.group);
       if (this.state.group === "") {
         if (this.state.activities[i].operation === "added") {
           activities.push(
@@ -119,12 +119,10 @@ class RecentActivities extends Component {
           );
         }
       } else {
-        console.log("Value of Group", this.state.group);
         if (
           this.state.activities[i].operation === "added" &&
           this.state.activities[i].groupname === this.state.group
         ) {
-          console.log("inside if");
           activities.push(
             <div className="activity">
               {this.state.activities[i].name} added the expense &nbsp;"
@@ -170,8 +168,9 @@ class RecentActivities extends Component {
 
     return (
       <div>
+        {this.state.redirectVar}
         <Head />
-        <div className="activities">
+        <div className="activities" key="keys">
           <h4>Recent activity</h4>
           <br />
           <br />
@@ -179,12 +178,18 @@ class RecentActivities extends Component {
             onChange={this.handleChange}
             value={this.state.group}
             id="group"
+            key="group"
           >
-            <option selected value="">
+            <option defaultValue value="" key="default">
               Select a group...
             </option>
             {this.state.groups.map((group) => {
-              return <option value={group}> {group} </option>;
+              return (
+                <option value={group} key={group}>
+                  {" "}
+                  {group}{" "}
+                </option>
+              );
             })}
           </select>
           &nbsp; &nbsp;
@@ -192,12 +197,17 @@ class RecentActivities extends Component {
             onChange={this.orderChange}
             value={this.state.order}
             id="order"
+            key="order"
           >
-            <option value="initial" selected>
+            <option value="initial" defaultValue key="initial">
               Sort By Date
             </option>
-            <option value="asc">Recent first</option>
-            <option value="desc">Recent last</option>
+            <option value="asc" key="asc">
+              Recent first
+            </option>
+            <option value="desc" key="desc">
+              Recent last
+            </option>
           </select>
           <br />
           <br />

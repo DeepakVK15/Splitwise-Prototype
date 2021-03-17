@@ -105,15 +105,20 @@ class login extends Component {
             <br />
             <label class="font-weight-bold">Email address: </label>
             <br />
-            <input type="email" id="email" onChange={this.emailChangeHandler} />
+            <input
+              type="email"
+              id="email"
+              value={this.state.email}
+              onChange={this.emailChangeHandler}
+            />
             <br />
             <br />
-
             <label class="font-weight-bold">Password: </label>
             <br />
             <input
               type="password"
               id="password"
+              value={this.state.password}
               onChange={this.passwordChangeHandler}
             />
             <br />

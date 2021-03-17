@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import Head from "../Heading/Heading";
 import "./profile.css";
 import cookie from "react-cookies";
+import { Redirect } from "react-router";
 
 class Profile extends Component {
   state = {
@@ -12,6 +13,7 @@ class Profile extends Component {
     timezone: "",
     language: "",
     currency: "",
+    redirectVar: "",
   };
 
   componentDidMount() {
@@ -21,12 +23,14 @@ class Profile extends Component {
       })
       .then((response) => {
         // update the state with the response data
-        this.setState({ name: response.data[0].name });
-        this.setState({ email: response.data[0].email });
-        this.setState({ phone: response.data[0].phone });
-        this.setState({ timezone: response.data[0].timezone });
-        this.setState({ language: response.data[0].language });
-        this.setState({ currency: response.data[0].currency });
+        if (response.data[0] !== undefined) {
+          this.setState({ name: response.data[0].name });
+          this.setState({ email: response.data[0].email });
+          this.setState({ phone: response.data[0].phone });
+          this.setState({ timezone: response.data[0].timezone });
+          this.setState({ language: response.data[0].language });
+          this.setState({ currency: response.data[0].currency });
+        }
       });
   }
 
@@ -76,12 +80,21 @@ class Profile extends Component {
       currency: this.state.currency,
     };
 
-
-    axios.post("http://localhost:3001/profile/myprofile", data);
+    axios
+      .put("http://localhost:3001/profile/myprofile", data)
+      .then((response) => {
+        if (response.data === "Profile updated successfully") {
+          window.location.reload(true);
+        }
+      });
   };
   render() {
+    if (!cookie.load("cookie")) {
+      this.setState({ redirectVar: <Redirect to="/" /> });
+    }
     return (
       <div>
+        {this.state.redirectVar}
         <Head />
         <div className="profile">
           <div>
@@ -96,12 +109,14 @@ class Profile extends Component {
                 name="name"
                 value={this.state.name}
                 onChange={this.nameChange}
+                data-testid="name"
               />
               <br />
               <br />
               <label>Your email address</label>
               <br />
               <input
+                data-testid="email"
                 type="text"
                 name="email"
                 value={this.state.email}
@@ -116,6 +131,7 @@ class Profile extends Component {
                 name="phone"
                 value={this.state.phone}
                 onChange={this.phoneChange}
+                data-testid="phone"
               />
             </form>
           </div>
@@ -428,7 +444,7 @@ class Profile extends Component {
             </select>
           </div>
         </div>
-        <button type="button" class="save" onClick={this.save}>
+        <button type="button" className="save" onClick={this.save}>
           Save
         </button>
       </div>

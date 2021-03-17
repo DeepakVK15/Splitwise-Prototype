@@ -20,9 +20,9 @@ class MyGroups extends Component {
     this.loadGroupPage = this.loadGroupPage.bind(this);
   }
 
-  componentDidMount() {
-    axios
-      .get("http://localhost:3001/mygroups/mygroups/", {
+  async componentDidMount() {
+    await axios
+      .get("http://localhost:3001/mygroups/mygroups", {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -31,7 +31,7 @@ class MyGroups extends Component {
           groups: this.state.groups.concat(response.data),
         });
       });
-    axios
+    await axios
       .get("http://localhost:3001/mygroups/invites", {
         params: { invite_to: this.state.email },
       })
@@ -47,9 +47,6 @@ class MyGroups extends Component {
   }
 
   loadGroupPage(e) {
-    // window.location.href ="/group/"+e;
-    // this.setState({redirect:<Redirect to='/group' />})
-    console.log("correctly passed ", e);
     this.setState({
       redirect: (
         <Redirect
@@ -123,17 +120,28 @@ class MyGroups extends Component {
       </div>
     ));
 
+    if (!cookie.load("cookie")) {
+      this.setState({ redirect: <Redirect to="/" /> });
+      cookie.remove("cookie");
+    }
+    let msg = null;
+    if (this.state.groups.length === 0) {
+      msg = <h6>You are not part of any group.</h6>;
+    }
+
     return (
       <div>
         {this.state.redirect}
         <Head />
+        <div className="expenses">
+          <h3>My Groups </h3>{" "}
+        </div>
         <div className="mygroups">
           <div>
             <br />
-            <label>My Groups </label> &nbsp; &nbsp;
             <Button
               variant="link"
-              class="addButton"
+              className="addButton"
               onClick={this.createGroupPage}
             >
               +add group
@@ -151,6 +159,7 @@ class MyGroups extends Component {
               <br />
             </div>
             <div>
+              {msg}
               <GroupContainer groups={this.dynamicSearch()} />
             </div>
           </div>

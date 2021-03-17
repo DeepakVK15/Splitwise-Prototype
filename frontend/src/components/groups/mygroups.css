@@ -1,64 +1,71 @@
-.groups{
-    margin-left: 600px;
-    margin-top:75px
+.groups {
+  margin-left: 600px;
+  margin-top: 75px;
 }
 
 .addButton {
-    font-size: small;
-    color: gray;
+  font-size: small;
+  color: gray;
+  margin-left: 200px;
 }
 
-.expenses{
-    margin-left:500px;
-    
+.expenses {
+  margin-left: 500px;
 }
-.group{
-    display:flex; flex-direction:row;
-    margin-left: 125px;
-}
-
-.groupBalance{
-    margin-left: 300px;
-    color: grey;
+.group {
+  display: flex;
+  flex-direction: row;
+  margin-left: 125px;
 }
 
+.expenseDesc {
+  font-size: 18px;
+}
+
+.groupBalance {
+  margin-left: 300px;
+  color: grey;
+}
 
 .logout {
-    margin-left:900px
+  margin-left: 900px;
 }
-.head{
-    margin-left:400px;
-    display:flex; flex-direction:row;
-    font-size: px;
-}
-
-
-.button{
-    margin-left:100px
+.head {
+  margin-left: 400px;
+  display: flex;
+  flex-direction: row;
+  font-size: px;
 }
 
-.mygroups{
-    font-size: medium;
-    color: grey;
-    display:flex; 
-    flex-direction:row;
-     margin-left:500px
-    }
+.button {
+  margin-left: 100px;
+}
 
-.invites{
-    margin-left: 400px;
-    font-size: medium;
-    margin-top:50px
+.mygroups {
+  font-size: medium;
+  color: grey;
+  display: flex;
+  flex-direction: row;
+  margin-left: 500px;
+}
+
+.invites {
+  margin-left: 400px;
+  font-size: medium;
+  margin-top: 50px;
 }
 
 .inviteButton {
-    width: 3vw;
-    height: 2vw;
-    display: inline-block;
+  width: 3vw;
+  height: 2vw;
+  display: inline-block;
 }
 
 .groupButtons {
-    margin-left: 50px;
+  margin-left: 50px;
 }
 
-
+.suggestions {
+  display: flex;
+  flex-direction: row;
+}

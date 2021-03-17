@@ -35,9 +35,6 @@ router.get("/borrower", function (req, res) {
 router.post("/modal", function (req, res) {
   const email = req.body.modalEmail;
   const user = req.body.email;
-
-  console.log("lender id", email);
-  console.log("borrower id", user);
   db.query(
     "delete from SplitWise.transaction where lenderid= ? and borrowerid= ?",
     [email, user],
@@ -46,7 +43,6 @@ router.post("/modal", function (req, res) {
         console.log(err);
       } else {
         console.log("Result ", result);
-        console.log("deleted successfully");
       }
     }
   );
@@ -55,7 +51,6 @@ router.post("/modal", function (req, res) {
 router.post("/settleup", function (req, res) {
   const email = req.body.name;
   const groupname = req.body.groupname;
-  console.log("Borrower ID", email);
   db.query(
     "delete from SplitWise.transaction where borrowerid= ? and groupid=?",
     [email, groupname],
@@ -67,8 +62,7 @@ router.post("/settleup", function (req, res) {
           "insert into SplitWise.activity(user,operation,groupname,amount,date,description) VALUES(?,?,?,?,now(), ?)",
           [email, "updated", groupname, null, null]
         );
-        console.log("Result ", result);
-        console.log("deleted successfully");
+        res.send("Balance settled");
       }
     }
   );

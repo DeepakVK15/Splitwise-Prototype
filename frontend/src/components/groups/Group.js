@@ -25,7 +25,9 @@ class Group extends Component {
       updateOpen: false,
       username: "",
       email: "",
-      currency:""
+      currency: "",
+      updateName: "",
+      updateGroupName: false,
     };
     this.descriptionHandler = this.descriptionHandler.bind(this);
     this.amountHandler = this.amountHandler.bind(this);
@@ -43,6 +45,12 @@ class Group extends Component {
       username: e.target.value,
     });
   };
+  groupNameChange = (e) => {
+    this.setState({
+      updateName: e.target.value,
+    });
+  };
+
   emailHandler = (e) => {
     this.setState({
       email: e.target.value,
@@ -95,27 +103,27 @@ class Group extends Component {
           groupBalance: this.state.groupBalance.concat(response.data),
         });
       });
-      axios.get("http://localhost:3001/profile/myprofile",{
-        params: { email: cookie.load("cookie") }
-    }).then((response) => {
-
-      this.setState({currency:response.data[0].currency})
-    });
+    axios
+      .get("http://localhost:3001/profile/myprofile", {
+        params: { email: cookie.load("cookie") },
+      })
+      .then((response) => {
+        this.setState({ currency: response.data[0].currency });
+      });
   }
 
   openModal = () => this.setState({ isOpen: true });
   updateOpen = () => this.setState({ updateOpen: true });
+  updateGroupName = () => this.setState({ updateGroupName: true });
   closeModal = () => {
-    console.log("Paid by in group", this.state.paidmember);
     const data = {
       description: this.state.description,
       paid_by: this.state.paidmember,
       groupname: this.state.name,
       amount: this.state.amount,
       date: this.state.date,
-      email: cookie.load("cookie")
+      email: cookie.load("cookie"),
     };
-    console.log("Amount is", data.amount);
     axios.post("http://localhost:3001/group/group", data);
 
     this.setState({ isOpen: false });
@@ -127,11 +135,21 @@ class Group extends Component {
       email: this.state.email,
       invitedby: cookie.load("cookie"),
     };
-    console.log("Amount is", data.amount);
     axios.post("http://localhost:3001/group/addUserToGroup", data);
 
     this.setState({ isOpen: false });
     window.location.reload(true);
+  };
+
+  updateGrpName = () => {
+    const data = {
+      groupname: this.state.name,
+      updateName: this.state.updateName,
+    };
+    axios.put("http://localhost:3001/group/updateGroupName", data);
+
+    this.setState({ updateGroupName: false });
+    window.location.reload();
   };
 
   close = () => {
@@ -139,6 +157,9 @@ class Group extends Component {
   };
   updateClose = () => {
     this.setState({ updateOpen: false });
+  };
+  updateGroupNameClose = () => {
+    this.setState({ updateGroupName: false });
   };
   landingPage = () => {
     this.setState({ redirectVar: <Redirect to="/" /> });
@@ -154,12 +175,16 @@ class Group extends Component {
       name: cookie.load("cookie"),
       groupname: this.state.name,
     };
-    axios.post("http://localhost:3001/transactions/settleup", data);
-    window.location.reload(true);
+    axios
+      .post("http://localhost:3001/transactions/settleup", data)
+      .then((response) => {
+        if (response.data === "Balance settled") {
+          window.location.reload(true);
+        }
+      });
   };
 
   leaveGroup = () => {
-    console.log("in leavegroup");
     const data = {
       name: cookie.load("cookie"),
       groupname: this.state.name,
@@ -171,7 +196,6 @@ class Group extends Component {
           message: response.data,
         });
       });
-    console.log("Exit: ", this.state.message);
   };
 
   updateGroup = () => {
@@ -189,7 +213,6 @@ class Group extends Component {
 
   render() {
     let errMsg = null;
-    console.log("message ", this.state.message);
     if (!cookie.load("cookie")) {
       this.setState({ redirectVar: <Redirect to="/" /> });
     }
@@ -213,10 +236,12 @@ class Group extends Component {
     }
 
     let expenses = this.state.expenses.map((expense) => (
-      <h6>
-        {expense.date.split("T")[0]} &nbsp; {expense.description} &nbsp;{" "}
-        {expense.name} &nbsp;{this.state.currency}{expense.amount}
-      </h6>
+      <div className="expenseDesc">
+        {expense.description} &nbsp; {expense.name} &nbsp;{this.state.currency}
+        {expense.amount}
+        <div className="date">{expense.date.split("T")[0]} &nbsp;</div>
+        <br />
+      </div>
     ));
 
     if (expenses.length === 0) {
@@ -227,7 +252,7 @@ class Group extends Component {
     for (let i = 0; i < this.state.groupBalance.length; i++) {
       if (
         this.state.groupBalance[i].balance !== null &&
-        this.state.groupBalance[i].balance != 0
+        this.state.groupBalance[i].balance !== "0"
       ) {
         if (this.state.groupBalance[i].balance > 0) {
           balance.push(
@@ -240,19 +265,15 @@ class Group extends Component {
           let temp = Math.abs(this.state.groupBalance[i].balance);
           balance.push(
             <h6>
-              {this.state.groupBalance[i].name} owes {this.state.currency}{temp}
+              {this.state.groupBalance[i].name} owes {this.state.currency}
+              {temp}
             </h6>
           );
         }
       }
     }
-    if(balance.length===0){
-      balance.push(
-      <h6>
-        No pending payments in this group.
-      </h6>
-
-      )
+    if (balance.length === 0) {
+      balance.push(<h6>No pending payments in this group.</h6>);
     }
 
     return (
@@ -270,6 +291,9 @@ class Group extends Component {
               {this.state.name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
+              <Dropdown.Item onClick={this.updateGroupName}>
+                Update Group Name
+              </Dropdown.Item>
               <Dropdown.Item onClick={this.updateOpen}>
                 Add a user
               </Dropdown.Item>
@@ -366,9 +390,34 @@ class Group extends Component {
             </Button>
           </Modal.Footer>
         </Modal>
+        <Modal
+          show={this.state.updateGroupName}
+          onHide={this.updateGroupNameClose}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Update Group Name</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form>
+              <input
+                type="text"
+                id="groupname"
+                onChange={this.groupNameChange}
+                placeholder="Group Name"
+                required
+              />
+              <br />
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" onClick={this.updateGrpName}>
+              Update
+            </Button>
+          </Modal.Footer>
+        </Modal>
         <div class="group">
           <div className="expenses">
-            <h5>Expenses: </h5>
+            <h3>Expenses </h3>
             <br />
             <br />
             {expenses}

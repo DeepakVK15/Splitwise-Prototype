@@ -16,6 +16,8 @@ class CreateGroup extends Component {
       image: null,
       errCode: "",
       redirectVar: null,
+      users: [],
+      suggestions: [],
     };
     this.groupnameHandler = this.groupnameHandler.bind(this);
     this.friendsHandler = this.friendsHandler.bind(this);
@@ -79,11 +81,46 @@ class CreateGroup extends Component {
       </div>
     ));
   }
+
   handleChange(i, e) {
     const { name, value } = e.target;
+    let suggestions = [];
+    if (value.length > 0) {
+      const regex = new RegExp(`${value}`, "i");
+      suggestions = this.state.users.sort().filter((v) => regex.test(v.name));
+    }
     let friends = [...this.state.friends];
     friends[i] = { ...friends[i], [name]: value };
     this.setState({ friends });
+    this.setState(() => ({ suggestions }));
+  }
+
+  renderSuggestions() {
+    const { suggestions } = this.state;
+    if (suggestions.length === 0) {
+      return null;
+    }
+    return (
+      <div>
+        {suggestions.map((user) => (
+          <ul onClick={this.clearSuggestions()}>
+            {user.name} - {user.email}
+          </ul>
+        ))}
+      </div>
+    );
+  }
+
+  clearSuggestions() {
+    this.state.suggestions = [];
+  }
+
+  componentDidMount() {
+    axios.get("http://localhost:3001/group/users").then((response) => {
+      this.setState({
+        users: this.state.users.concat(response.data),
+      });
+    });
   }
 
   createGroup() {
@@ -135,7 +172,7 @@ class CreateGroup extends Component {
         <Head />
         <img
           className="loginImage"
-          alt=""
+          alt="createGrp"
           src={head}
           width="150"
           height="150"
@@ -161,12 +198,15 @@ class CreateGroup extends Component {
               id="groupname"
               onChange={this.groupnameHandler}
               placeholder="Group name"
+              data-testid="groupname"
+              value={this.state.groupname}
             />
             <br />
             <br />
             <label class="font-weight-normal">GROUP MEMBERS</label>
             <br />
             {this.createUI()}
+            {this.renderSuggestions()}
             <Button variant="link" onClick={this.addClick.bind(this)}>
               +Add a person
             </Button>

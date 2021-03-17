@@ -8,13 +8,13 @@ router.post("/creategroup", function (req, res) {
   const image = req.body.image;
   const email = req.body.email;
   db.query(
-    "select * from groups where groupname = ?",
+    "select * from SplitWise.groups where groupname = ?",
     [groupname],
     (err, result) => {
       if (err) {
         console.log(err);
       }
-      if (result.length > 0) {
+      if (result.length === 1) {
         res.send({ message: "Group with the same name already exists." });
       } else {
         db.query("insert into SplitWise.groups(groupname,image) VALUES (?,?)", [
@@ -61,9 +61,18 @@ router.post("/creategroup", function (req, res) {
   );
 });
 
+router.get("/users", function (req, res) {
+  db.query("select name, email from SplitWise.users", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
+
 router.get("/group", function (req, res) {
   const groupname = req.query.name;
-  console.log("Group name is", groupname);
 
   db.query(
     "select expense.description, expense.paid_by, expense.group_name, expense.amount, expense.date, users.name as name from SplitWise.expense inner join SplitWise.users on expense.paid_by = users.email and expense.group_name= ? order by expense.date desc",
@@ -72,7 +81,6 @@ router.get("/group", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Result:", result);
         res.send(result);
       }
     }
@@ -87,7 +95,6 @@ router.post("/group", function (req, res) {
   const date = req.body.date;
   const email = req.body.email;
 
-  console.log("Paid_By:", paid_by);
   db.query(
     "insert into expense (description, paid_by, group_name, amount, date) VALUES (?,?,?,?,?)",
     [desc, paid_by, group_name, amount, date],
@@ -95,7 +102,6 @@ router.post("/group", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Result:", result);
         db.query(
           "insert into SplitWise.activity(user,operation,groupname,amount,date, description) VALUES(?,?,?,?,now(), ?)",
           [email, "added", group_name, amount, desc]
@@ -135,9 +141,7 @@ router.post("/leaveGroup", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Result is", result[0].balance);
         if (result[0].balance === "0") {
-          console.log("after balance=0");
           db.query(
             "delete from SplitWise.usersingroup where email= ? and groupname=?",
             [name, groupname],
@@ -145,7 +149,6 @@ router.post("/leaveGroup", function (req, res) {
               if (err) {
                 console.log(err);
               } else {
-                console.log("Is it coming here.");
                 res.send("Exited from group");
               }
             }
@@ -172,9 +175,9 @@ router.post("/addUserToGroup", function (req, res) {
     [invitedby, email, groupname],
     (err, result) => {
       if (err) {
-        console.log(err);
+        res.send("User already invited to the group");
       } else {
-        console.log("invite inserted", result);
+        res.send("Invite sent to user.");
       }
     }
   );
@@ -182,7 +185,6 @@ router.post("/addUserToGroup", function (req, res) {
 
 router.get("/members", function (req, res) {
   const groupname = req.query.name;
-  console.log("Group name: ", groupname);
   db.query(
     "select users.name,users.email from SplitWise.usersingroup inner join SplitWise.users on usersingroup.email = users.email where groupname = ?",
     [groupname],
@@ -190,7 +192,6 @@ router.get("/members", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Group Members", result);
         res.send(result);
       }
     }
@@ -209,7 +210,6 @@ router.get("/groupbalances", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        console.log("Group Members12", result);
         for (let i = 0; i < result.length; i++) {
           db.query(
             "select coalesce((select SUM(amount) as sum from SplitWise.transaction inner join SplitWise.users on transaction.borrowerid=users.email where lenderid = ? and groupid=?), 0)- coalesce((select SUM(amount) as reduce from SplitWise.transaction inner join SplitWise.users on transaction.lenderid=users.email where borrowerid = ? and groupid=?), 0) as balance;",
@@ -228,10 +228,26 @@ router.get("/groupbalances", function (req, res) {
                   res.send(balance);
                 }
               }
-              console.log("Balance is", balance);
             }
           );
         }
+      }
+    }
+  );
+});
+
+router.put("/updateGroupName", function (req, res) {
+  const groupname = req.body.groupname;
+  const updatedName = req.body.updateName;
+
+  db.query(
+    "update SplitWise.groups set groupname=? where groupname=?",
+    [updatedName, groupname],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send("Group Name updated");
       }
     }
   );

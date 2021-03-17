@@ -9,12 +9,12 @@ var cookieParser = require("cookie-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({origin: "http://localhost:3000", credentials: true }));
 
 //use express session to maintain session data
 app.use(
   session({
-    secret: "cmpe273_kafka_passport_mongo",
+    secret: "splitwise_prototype",
     resave: false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
     saveUninitialized: false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
     duration: 60 * 60 * 1000, // Overall duration of Session : 30 minutes : 1800 seconds
@@ -24,7 +24,6 @@ app.use(
 
 //Allow Access Control
 app.use(function (req, res, next) {
-  //   res.setHeader("Access-Control-Allow-Origin", frontendURI);
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
@@ -38,17 +37,6 @@ app.use(function (req, res, next) {
   res.setHeader("Cache-Control", "no-cache");
   next();
 });
-
-//use express session to maintain session data
-app.use(
-  session({
-    secret: "cmpe273_kafka_passport_mongo",
-    resave: false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
-    saveUninitialized: false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
-    duration: 60 * 60 * 1000, // Overall duration of Session : 30 minutes : 1800 seconds
-    activeDuration: 5 * 60 * 1000,
-  })
-);
 
 app.use(express.static('./public'));
 

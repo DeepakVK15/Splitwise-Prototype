@@ -16,8 +16,6 @@ class CenterPage extends Component {
       currency: "",
     };
     this.modalEmailHandler = this.modalEmailHandler.bind(this);
-
-    //   this.display = this.display.bind(this);
   }
   modalEmailHandler = (e) => {
     this.setState({
@@ -31,7 +29,6 @@ class CenterPage extends Component {
       email: cookie.load("cookie"),
       modalEmail: this.state.modalEmail,
     };
-    console.log("Centerpage ", data.modalEmail);
     axios.post("http://localhost:3001/transactions/modal", data);
     this.setState({ isOpen: false });
     window.location.reload(true);
@@ -77,7 +74,6 @@ class CenterPage extends Component {
     let owed = 0;
     let oweList = [];
     let owedList = [];
-    //if not logged in go to login page
     for (let i = 0; i < this.state.owedTransactions.length; i++) {
       total_amount += this.state.owedTransactions[i].amount;
       owed += this.state.owedTransactions[i].amount;
