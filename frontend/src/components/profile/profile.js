@@ -134,6 +134,12 @@ class Profile extends Component {
                 onChange={this.phoneChange}
                 data-testid="phone"
               />
+              <br/>
+              <br />
+              <label>Change your Picture</label>
+                <br/>
+                <input type="file"/>
+                <br/>
             </form>
           </div>
           <div className="profile2">
