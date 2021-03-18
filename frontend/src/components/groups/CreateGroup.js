@@ -6,6 +6,7 @@ import axios from "axios";
 import { Redirect } from "react-router";
 import cookie from "react-cookies";
 import Head from "../Heading/Heading";
+import {uri} from '../../uri';
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -116,7 +117,7 @@ class CreateGroup extends Component {
   }
 
   componentDidMount() {
-    axios.get("http://localhost:3001/group/users").then((response) => {
+    axios.get(`${uri}/group/users`).then((response) => {
       this.setState({
         users: this.state.users.concat(response.data),
       });
@@ -138,7 +139,7 @@ class CreateGroup extends Component {
 
       axios.defaults.withCredentials = true;
       axios
-        .post("http://localhost:3001/group/creategroup", data)
+        .post(`${uri}/group/creategroup`, data)
         .then((response) => {
           // eslint-disable-next-line react/no-direct-mutation-state
           // this.setState({errCode :response.status})

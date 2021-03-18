@@ -1,9 +1,10 @@
 import { USER_SIGNUP } from "./types";
 import axios from "axios";
+import {uri} from '../uri';
 
 export const userSignup = (data) => dispatch => {
     axios.defaults.withCredentials = true;
-    axios.post(`http://localhost:3001/signup/`, data)
+    axios.post(`${uri}/signup/`, data)
         .then(response => dispatch({
             type: USER_SIGNUP,
             payload: response.data

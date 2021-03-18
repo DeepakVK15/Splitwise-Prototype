@@ -3,6 +3,7 @@ import "./centerpage.css";
 import { Modal, Button } from "react-bootstrap";
 import axios from "axios";
 import cookie from "react-cookies";
+import {uri} from '../../uri';
 
 class CenterPage extends Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class CenterPage extends Component {
       email: cookie.load("cookie"),
       modalEmail: this.state.modalEmail,
     };
-    axios.post("http://localhost:3001/transactions/modal", data);
+    axios.post(`${uri}/transactions/modal`, data);
     this.setState({ isOpen: false });
     window.location.reload(true);
   };
@@ -40,7 +41,7 @@ class CenterPage extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/transactions/lender/", {
+      .get(`${uri}/transactions/lender/`, {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -50,7 +51,7 @@ class CenterPage extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/transactions/borrower/", {
+      .get(`${uri}/transactions/borrower/`, {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -60,7 +61,7 @@ class CenterPage extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/profile/myprofile", {
+      .get(`${uri}/profile/myprofile`, {
         params: { email: this.state.email },
       })
       .then((response) => {

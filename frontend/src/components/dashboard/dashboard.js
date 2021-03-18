@@ -8,6 +8,7 @@ import CenterPage from "../centerpage/CenterPage";
 import { connect } from "react-redux";
 import "./dashboard.css";
 import axios from "axios";
+import {uri} from '../../uri';
 
 class dashboard extends Component {
   constructor(props) {
@@ -32,7 +33,7 @@ class dashboard extends Component {
     console.log("here ", this.state.email);
     if (this.state.email) {
       axios
-        .get("http://localhost:3001/login/user/", {
+        .get(`${uri}/login/user/`, {
           params: { email: this.state.email },
         })
         .then((response) => {

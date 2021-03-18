@@ -1,9 +1,10 @@
 import { USER_LOGIN, USER_LOGOUT } from "./types";
 import axios from "axios";
+import {uri} from '../uri';
 
 export const userLogin = (data) => dispatch => {
     axios.defaults.withCredentials = true;
-    axios.post("http://localhost:3001/login", data)
+    axios.post(`${uri}/login`, data)
         .then(response => dispatch({
             type: USER_LOGIN,
             payload: response.data

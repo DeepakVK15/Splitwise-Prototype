@@ -6,6 +6,7 @@ import { Redirect } from "react-router";
 import cookie from "react-cookies";
 import Head from "../Heading/Heading";
 import GroupContainer from "./GroupContainer";
+import {uri} from '../../uri';
 
 class MyGroups extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class MyGroups extends Component {
 
   async componentDidMount() {
     await axios
-      .get("http://localhost:3001/mygroups/mygroups", {
+      .get(`${uri}/mygroups/mygroups`, {
         params: { email: this.state.email },
       })
       .then((response) => {
@@ -32,7 +33,7 @@ class MyGroups extends Component {
         });
       });
     await axios
-      .get("http://localhost:3001/mygroups/invites", {
+      .get(`${uri}/mygroups/invites`, {
         params: { invite_to: this.state.email },
       })
       .then((response) => {
@@ -72,7 +73,7 @@ class MyGroups extends Component {
       invite_to: username,
       group: groupname,
     };
-    axios.post("http://localhost:3001/mygroups/acceptInvite", data);
+    axios.post(`${uri}/mygroups/acceptInvite`, data);
     window.location.reload(true);
   };
 
@@ -81,7 +82,7 @@ class MyGroups extends Component {
       invite_to: username,
       group: groupname,
     };
-    axios.post("http://localhost:3001/mygroups/rejectInvite", data);
+    axios.post(`${uri}/mygroups/rejectInvite`, data);
     window.location.reload(true);
   };
 

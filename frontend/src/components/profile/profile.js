@@ -4,6 +4,7 @@ import Head from "../Heading/Heading";
 import "./profile.css";
 import cookie from "react-cookies";
 import { Redirect } from "react-router";
+import {uri} from '../../uri';
 
 class Profile extends Component {
   state = {
@@ -18,7 +19,7 @@ class Profile extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/profile/myprofile", {
+      .get(`${uri}/profile/myprofile`, {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {
@@ -81,7 +82,7 @@ class Profile extends Component {
     };
 
     axios
-      .put("http://localhost:3001/profile/myprofile", data)
+      .put(`${uri}/profile/myprofile`, data)
       .then((response) => {
         if (response.data === "Profile updated successfully") {
           window.location.reload(true);

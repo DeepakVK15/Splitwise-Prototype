@@ -4,6 +4,7 @@ import cookie from "react-cookies";
 import "./activities.css";
 import Head from "../Heading/Heading";
 import { Redirect } from "react-router-dom";
+import {uri} from '../../uri';
 
 class RecentActivities extends Component {
   state = {
@@ -16,7 +17,7 @@ class RecentActivities extends Component {
 
   async componentDidMount() {
     await axios
-      .get("http://localhost:3001/activities/myactivities", {
+      .get(`${uri}/activities/myactivities`, {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {
@@ -27,7 +28,7 @@ class RecentActivities extends Component {
       });
 
     await axios
-      .get("http://localhost:3001/mygroups/mygroups", {
+      .get(`${uri}/mygroups/mygroups`, {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {

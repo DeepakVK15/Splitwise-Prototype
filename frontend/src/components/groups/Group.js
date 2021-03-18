@@ -6,6 +6,7 @@ import "./mygroups.css";
 import { Redirect } from "react-router";
 import Head from "../Heading/Heading";
 import { Dropdown } from "react-bootstrap";
+import {uri} from '../../uri';
 
 class Group extends Component {
   constructor(props) {
@@ -76,7 +77,7 @@ class Group extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3001/group/group", {
+      .get(`${uri}/group/group`, {
         params: { name: this.state.name },
       })
       .then((response) => {
@@ -86,7 +87,7 @@ class Group extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/group/members", {
+      .get(`${uri}/group/members`, {
         params: { name: this.state.name },
       })
       .then((response) => {
@@ -95,7 +96,7 @@ class Group extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/group/groupbalances", {
+      .get(`${uri}/group/groupbalances`, {
         params: { groupname: this.state.name },
       })
       .then((response) => {
@@ -104,7 +105,7 @@ class Group extends Component {
         });
       });
     axios
-      .get("http://localhost:3001/profile/myprofile", {
+      .get(`${uri}/profile/myprofile`, {
         params: { email: cookie.load("cookie") },
       })
       .then((response) => {
@@ -124,7 +125,7 @@ class Group extends Component {
       date: this.state.date,
       email: cookie.load("cookie"),
     };
-    axios.post("http://localhost:3001/group/group", data);
+    axios.post(`${uri}/group/group`, data);
 
     this.setState({ isOpen: false });
     window.location.reload(true);
@@ -135,7 +136,7 @@ class Group extends Component {
       email: this.state.email,
       invitedby: cookie.load("cookie"),
     };
-    axios.post("http://localhost:3001/group/addUserToGroup", data);
+    axios.post(`${uri}/group/addUserToGroup`, data);
 
     this.setState({ isOpen: false });
     window.location.reload(true);
@@ -146,7 +147,7 @@ class Group extends Component {
       groupname: this.state.name,
       updateName: this.state.updateName,
     };
-    axios.put("http://localhost:3001/group/updateGroupName", data);
+    axios.put(`${uri}/group/updateGroupName`, data);
 
     this.setState({ updateGroupName: false });
     window.location.reload();
@@ -176,7 +177,7 @@ class Group extends Component {
       groupname: this.state.name,
     };
     axios
-      .post("http://localhost:3001/transactions/settleup", data)
+      .post(`${uri}/transactions/settleup`, data)
       .then((response) => {
         if (response.data === "Balance settled") {
           window.location.reload(true);
@@ -190,7 +191,7 @@ class Group extends Component {
       groupname: this.state.name,
     };
     axios
-      .post("http://localhost:3001/group/leaveGroup", data)
+      .post(`${uri}/group/leaveGroup`, data)
       .then((response) => {
         this.setState({
           message: response.data,
