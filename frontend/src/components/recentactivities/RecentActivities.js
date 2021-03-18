@@ -110,7 +110,7 @@ class RecentActivities extends Component {
         } else if (this.state.activities[i].operation === "updated") {
           activities.push(
             <div className="activity">
-              {this.state.activities[i].name} updated the group &nbsp; "
+              {this.state.activities[i].name} settled the balance in &nbsp;"
               {this.state.activities[i].groupname}"
               <div className="date">
                 {this.state.activities[i].date.split("T")[0]}

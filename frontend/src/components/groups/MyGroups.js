@@ -43,10 +43,6 @@ class MyGroups extends Component {
       });
   }
 
-  createGroupPage() {
-    window.location.href = "/creategroup";
-  }
-
   loadGroupPage(e) {
     this.setState({
       redirect: (
@@ -139,15 +135,6 @@ class MyGroups extends Component {
         </div>
         <div className="mygroups">
           <div>
-            <br />
-            <Button
-              variant="link"
-              className="addButton"
-              onClick={this.createGroupPage}
-            >
-              +add group
-            </Button>
-            <br />
             <br />
             <div>
               <input
