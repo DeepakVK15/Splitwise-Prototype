@@ -141,7 +141,7 @@ router.post("/leaveGroup", function (req, res) {
       if (err) {
         console.log(err);
       } else {
-        if (result[0].balance === "0") {
+        if (result[0].balance === 0) {
           db.query(
             "delete from SplitWise.usersingroup where email= ? and groupname=?",
             [name, groupname],
@@ -155,7 +155,7 @@ router.post("/leaveGroup", function (req, res) {
           );
         } else {
           if (result[0].balance > 0) {
-            res.send("Please wait to recieve the remaining amount.");
+            res.send("Please clear your dues and leave the group after recieving the amount you are owed.");
           } else if (result[0].balance < 0) {
             res.send("Please clear your dues to leave the group.");
           }

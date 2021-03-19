@@ -85,7 +85,7 @@ class Profile extends Component {
       .put(`${uri}/profile/myprofile`, data)
       .then((response) => {
         if (response.data === "Profile updated successfully") {
-          window.location.reload(true);
+          this.setState({ redirectVar: <Redirect to="/dashboard" /> });
         }
       });
   };

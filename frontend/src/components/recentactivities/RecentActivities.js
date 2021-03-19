@@ -11,7 +11,7 @@ class RecentActivities extends Component {
     activities: [],
     groups: [],
     group: "",
-    order: "",
+    order: "asc",
     redirectVar: "",
   };
 

@@ -217,10 +217,10 @@ class Group extends Component {
     if (!cookie.load("cookie")) {
       this.setState({ redirectVar: <Redirect to="/" /> });
     }
-    if (this.state.message === "Exited from group") {
-      this.setState({ redirectVar: <Redirect to="/mygroups" /> });
-    }
-    if (this.state.message === "Please wait to recieve the remaining amount.") {
+    if(this.state.message === "Exited from group"){
+      this.setState({ redirectVar: <Redirect to="/dashboard" /> });
+      }  
+    if (this.state.message === "Please clear your dues and leave the group after recieving the amount you are owed.") {
       errMsg = (
         <div class="alert alert-danger" role="alert">
           {this.state.message}
@@ -253,7 +253,7 @@ class Group extends Component {
     for (let i = 0; i < this.state.groupBalance.length; i++) {
       if (
         this.state.groupBalance[i].balance !== null &&
-        this.state.groupBalance[i].balance !== "0"
+        this.state.groupBalance[i].balance !== 0
       ) {
         if (this.state.groupBalance[i].balance > 0) {
           balance.push(

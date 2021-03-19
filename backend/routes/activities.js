@@ -15,7 +15,7 @@ router.get("/myactivities", function (req, res) {
         } else {
           for (let i = 0; i < result1.length; i++) {
             db.query(
-              "select activity.*, users.name from SplitWise.activity inner join SplitWise.users on activity.user = users.email where groupname = ? order by activity.date desc",
+              "select activity.*, users.name from SplitWise.activity inner join SplitWise.users on activity.user = users.email where groupname = ? order by activity.id desc",
               [result1[i].groupname],
               (err, result2) => {
                 if (err) {
